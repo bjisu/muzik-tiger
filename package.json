@@ -1,0 +1,22 @@
+{
+  "name": "muzik-comfort",
+  "version": "1.0.0",
+  "private": true,
+  "description": "무직타이거 · 오늘의 위로 — NFC 굿즈(모니터 뚱랑이) 태그로 열리는 데일리 위로 카드 웹",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "next": "14.2.32",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "20.14.10",
+    "@types/react": "18.3.3",
+    "@types/react-dom": "18.3.0",
+    "typescript": "5.5.4"
+  }
+}
