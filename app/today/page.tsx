@@ -56,7 +56,7 @@ export default function TodayPage() {
 
       <main className="today-main">
         <div className="today-badge">
-          <span aria-hidden>🐯</span> 오늘의 {CATEGORY_KO[card.category]} 한마디
+          오늘의 {CATEGORY_KO[card.category]} 한마디
         </div>
 
         <ComfortCardView card={card} />

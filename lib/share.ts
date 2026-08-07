@@ -1,7 +1,7 @@
 import type { ComfortCard } from './types';
 import { designOf, formatCardDate } from './cards';
 
-/** 캔버스에 카드 이미지(배경 템플릿 + 문구 + 날짜 + 선물 한마디)를 렌더링해 Blob으로 반환 */
+/** 캔버스에 카드 이미지(배경 템플릿 + 문구 + 선물 한마디)를 렌더링해 Blob으로 반환 */
 export async function renderCardImage(
   card: ComfortCard,
   opts?: { note?: string },
@@ -27,10 +27,6 @@ export async function renderCardImage(
   const fontFamily =
     "'Pretendard', 'Pretendard Variable', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif";
 
-  // 날짜
-  const dateSize = Math.round(W * 0.028);
-  ctx.font = `600 ${dateSize}px ${fontFamily}`;
-  ctx.fillStyle = design.accent;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'alphabetic';
 
@@ -40,21 +36,23 @@ export async function renderCardImage(
   const lines = wrapText(ctx, `“${card.message}”`, maxWidth);
 
   const lineHeight = msgSize * 1.5;
-  const noteSize = Math.round(W * 0.03);
   const hasNote = !!opts?.note?.trim();
-  // 선물 한마디가 있으면 날짜는 생략(텍스트 박스 밖 배너와 겹침 방지)
-  const showDate = !hasNote;
 
-  const blockHeight =
-    (showDate ? dateSize * 1.9 : 0) + lines.length * lineHeight + (hasNote ? noteSize * 2.1 : 0);
-  let y = boxCenterY - blockHeight / 2 + (showDate ? dateSize : 0);
+  // 날짜(yy.mm.dd) — 원본 아트의 '오늘의 한마디' 자리, 문구 바로 위
+  const dateSize = Math.round(W * 0.026);
+  const dateH = dateSize * 1.2;
+  const dateGap = W * 0.012;
 
-  if (showDate) {
-    ctx.font = `600 ${dateSize}px ${fontFamily}`;
-    ctx.fillStyle = design.accent;
-    ctx.fillText(formatCardDate(), W / 2, y);
-    y += dateSize * 0.9;
-  }
+  // 날짜 + 문구 블록 — 한마디 유무와 무관하게 항상 같은 좌표(한마디 높이는 계산에서 제외)
+  // 중앙에서 카드 높이의 2%만큼 위로 올린다
+  const blockHeight = dateH + dateGap + lines.length * lineHeight;
+  let y = boxCenterY - blockHeight / 2 - H * 0.02;
+
+  ctx.font = `700 ${dateSize}px ${fontFamily}`;
+  ctx.fillStyle = design.accent;
+  y += dateH;
+  ctx.fillText(formatCardDate(), W / 2, y);
+  y += dateGap;
 
   ctx.font = `700 ${msgSize}px ${fontFamily}`;
   ctx.fillStyle = design.ink;
@@ -63,16 +61,32 @@ export async function renderCardImage(
     ctx.fillText(line, W / 2, y);
   }
 
+  // 받는 사람 한마디 — 문구 흐름과 무관하게 텍스트 박스 하단 경계 위 고정 좌표에 그린다
   if (hasNote) {
-    y += noteSize * 2.1;
-    ctx.font = `500 ${noteSize}px ${fontFamily}`;
+    const noteSize = Math.round(W * 0.028);
+    const noteLineH = Math.round(noteSize * 1.6);
+    const maxNoteW = W * 0.75;
+
+    ctx.font = `700 ${noteSize}px ${fontFamily}`;
+    const noteText = ellipsize(ctx, opts!.note!.trim(), maxNoteW);
+    const noteY = boxBottom - noteLineH - W * 0.015;
+
     ctx.fillStyle = design.accent;
-    ctx.fillText(`♥ ${opts!.note!.trim()}`, W / 2, y);
+    ctx.textBaseline = 'middle';
+    ctx.fillText(noteText, W / 2, noteY + noteLineH / 2 + noteSize * 0.06);
   }
 
   return await new Promise<Blob>((resolve, reject) => {
     canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('toBlob failed'))), 'image/png');
   });
+}
+
+/** 현재 ctx 폰트 기준으로 maxWidth를 넘으면 말줄임표로 자른다 */
+function ellipsize(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string {
+  if (ctx.measureText(text).width <= maxWidth) return text;
+  let s = text;
+  while (s.length > 1 && ctx.measureText(s + '…').width > maxWidth) s = s.slice(0, -1);
+  return s + '…';
 }
 
 function loadImage(src: string): Promise<HTMLImageElement> {
@@ -109,10 +123,11 @@ export async function shareCardImage(
 ): Promise<'shared' | 'downloaded'> {
   const blob = await renderCardImage(card, { note: opts?.note });
   const file = new File([blob], 'muziktiger-comfort.png', { type: 'image/png' });
+  // 문구·한마디는 모두 이미지 안에 들어 있으므로, 별도 텍스트는 명시했을 때만 첨부
   const shareData: ShareData = {
     files: [file],
     title: '무직타이거 오늘의 위로',
-    text: opts?.text ?? `“${card.message}” — 무직타이거 오늘의 위로`,
+    ...(opts?.text ? { text: opts.text } : {}),
   };
 
   if (typeof navigator !== 'undefined' && navigator.canShare?.({ files: [file] })) {

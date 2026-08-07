@@ -143,9 +143,10 @@ export function pickTodayCard(now = new Date()): ComfortCard {
   return picked;
 }
 
+/** 카드에 찍히는 날짜 — yy.mm.dd */
 export function formatCardDate(d = new Date()): string {
-  const y = d.getFullYear();
+  const y = String(d.getFullYear() % 100).padStart(2, '0');
   const m = String(d.getMonth() + 1).padStart(2, '0');
   const day = String(d.getDate()).padStart(2, '0');
-  return `${y}.${m}.${day} · ${WEEKDAY_KO[d.getDay()]}`;
+  return `${y}.${m}.${day}`;
 }

@@ -63,9 +63,7 @@ export default function GiftPage() {
           objectType: 'feed',
           content: {
             title: '무직타이거 오늘의 위로 🧡',
-            description: note.trim()
-              ? `“${card.message}” — ${note.trim()}`
-              : `“${card.message}”`,
+            description: `“${card.message}”`,
             imageUrl: new URL('/cards/tradition.webp', url).toString(),
             link: { mobileWebUrl: url, webUrl: url },
           },
@@ -73,12 +71,8 @@ export default function GiftPage() {
         });
         logEvent('gift_share', { cardId: card.id, channel: 'kakao' });
       } else {
-        const result = await shareCardImage(card, {
-          note,
-          text: note.trim()
-            ? `“${card.message}” — ${note.trim()} · 무직타이거 오늘의 위로`
-            : `“${card.message}” · 무직타이거 오늘의 위로`,
-        });
+        // 문구와 한마디는 모두 이미지 안에 크게 들어가므로, 텍스트 메시지는 따로 보내지 않는다
+        const result = await shareCardImage(card, { note });
         logEvent('gift_share', { cardId: card.id, channel: 'share_sheet' });
         if (result === 'downloaded') showToast('카드 이미지를 저장했어요. 카톡에 첨부해 보내주세요!');
       }

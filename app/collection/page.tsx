@@ -77,7 +77,7 @@ export default function CollectionPage() {
         ) : (
           <div className="thumb-grid">
             {cards.map((c) => (
-              <ComfortCardView key={c.id} card={c} showDate={false} onClick={() => setSelected(c)} />
+              <ComfortCardView key={c.id} card={c} onClick={() => setSelected(c)} />
             ))}
           </div>
         )}

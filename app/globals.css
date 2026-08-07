@@ -250,12 +250,16 @@ button {
   justify-content: center;
   text-align: center;
   gap: 1.2cqw;
+  /* 아래 여백만큼 flex 중앙이 위로 밀린다 → 날짜·문구 블록이 중앙에서 2cqw 위로.
+     한마디는 absolute(패딩 박스 기준)라 이 값에 영향받지 않는다. */
+  padding-bottom: 4cqw;
 }
 
 .card-overlay .card-date {
-  font-size: 2.7cqw;
+  font-size: 2.6cqw;
   font-weight: 700;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
 }
 
 .card-overlay .card-message {
@@ -265,9 +269,20 @@ button {
   word-break: keep-all;
 }
 
+/* 한마디는 흐름에서 빠져 텍스트 박스 하단에 겹쳐 뜬다 — 날짜·문구 위치에 영향 없음 */
 .card-overlay .card-note {
-  font-size: 3cqw;
-  font-weight: 600;
+  position: absolute;
+  left: 50%;
+  bottom: 1.5cqw;
+  transform: translateX(-50%);
+  font-size: 2.8cqw;
+  font-weight: 700;
+  line-height: 1.6;
+  max-width: 96%; /* .card-overlay 폭(카드의 78%) 기준 → 카드 폭의 약 75% */
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* ─── 버튼 ─── */
