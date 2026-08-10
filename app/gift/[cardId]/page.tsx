@@ -40,17 +40,14 @@ export default function GiftPage() {
     );
   }
 
-  const buildImage = async () => {
-    const blob = await renderCardImage(card, { note, design: fixedDesign });
-    return { blob, file: new File([blob], FILE_NAME, { type: 'image/png' }) };
-  };
+  const buildImage = () => renderCardImage(card, { note, design: fixedDesign });
 
   /** 이미지 저장하기 — 공유 시트 없이 바로 다운로드(성공 시 토스트도 띄우지 않는다) */
   const onSave = async () => {
     if (busy) return;
     setBusy(true);
     try {
-      const { blob } = await buildImage();
+      const blob = await buildImage();
       downloadBlob(blob, FILE_NAME);
       logEvent('gift_share', { cardId: card.id, channel: 'save' });
     } catch {
@@ -65,7 +62,8 @@ export default function GiftPage() {
     if (busy) return;
     setBusy(true);
     try {
-      const { blob, file } = await buildImage();
+      const blob = await buildImage();
+      const file = new File([blob], FILE_NAME, { type: 'image/png' });
       if (navigator.canShare?.({ files: [file] })) {
         // 문구·한마디가 이미지 안에 들어 있으므로 text는 붙이지 않는다
         await navigator.share({ files: [file], title: SHARE_TITLE });

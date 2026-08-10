@@ -10,7 +10,6 @@ export interface ComfortCard {
   category: ComfortCategory;
   weekday?: 0 | 1 | 2 | 3 | 4 | 5 | 6; // 특정 요일 가중(선택) — 0=일 … 6=토
   timeslot?: Timeslot;
-  season?: string; // 시즌/이벤트 태그(선택)
   design?: CardDesign; // 카드 배경 템플릿(선택, 없으면 자동 배정)
 }
 
