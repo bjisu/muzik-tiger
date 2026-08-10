@@ -255,11 +255,17 @@ button {
   padding-bottom: 4cqw;
 }
 
-.card-overlay .card-date {
-  font-size: 2.6cqw;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  line-height: 1.2;
+/* 아트의 리본 배너 위 날짜 — 리본 중심에 세로 정렬 */
+.card-frame .card-ribbon-date {
+  position: absolute;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  text-align: center;
+  font-size: 3.8cqw;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  line-height: 1;
 }
 
 .card-overlay .card-message {

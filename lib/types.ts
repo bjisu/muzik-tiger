@@ -20,6 +20,8 @@ export interface UserComfortState {
   lastVisitDate: string; // YYYY-MM-DD
   seenToday?: { date: string; cardId: string };
   recentCardIds: string[]; // 최근 노출 카드(재노출 방지)
+  /** 저장 시점에 보였던 배경 디자인 — 나중에 날짜가 바뀌어도 그 모습 그대로 유지 */
+  savedDesigns: Record<string, CardDesign>;
 }
 
 export interface AnalyticsEvent {

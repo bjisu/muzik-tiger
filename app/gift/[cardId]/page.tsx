@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import ComfortCardView from '@/components/ComfortCardView';
 import { useToast } from '@/components/Toast';
-import { cardById } from '@/lib/cards';
+import { cardById, designOf, isCardDesign } from '@/lib/cards';
 import { renderCardImage, shareCardImage, downloadBlob } from '@/lib/share';
 import { logEvent } from '@/lib/analytics';
 
@@ -20,7 +20,11 @@ const KAKAO_KEY = process.env.NEXT_PUBLIC_KAKAO_JS_KEY;
 /** C-03 선물 공유 — 카드 프리뷰 + 받는 사람 한마디 + 카카오/인스타 공유 (기획서 6) */
 export default function GiftPage() {
   const params = useParams<{ cardId: string }>();
+  const searchParams = useSearchParams();
   const card = cardById(params.cardId);
+  // 보내는 사람이 본 디자인(?d=forest). 없으면 오늘 날짜 기준 배정
+  const dParam = searchParams.get('d');
+  const fixedDesign = isCardDesign(dParam) ? dParam : undefined;
   const [note, setNote] = useState('');
   const [busy, setBusy] = useState(false);
   const [toast, showToast] = useToast();
@@ -64,7 +68,7 @@ export default function GiftPage() {
           content: {
             title: '무직타이거 오늘의 위로 🧡',
             description: `“${card.message}”`,
-            imageUrl: new URL('/cards/tradition.webp', url).toString(),
+            imageUrl: new URL(designOf(card, { design: fixedDesign }).src, url).toString(),
             link: { mobileWebUrl: url, webUrl: url },
           },
           buttons: [{ title: '위로 카드 열기', link: { mobileWebUrl: url, webUrl: url } }],
@@ -72,7 +76,7 @@ export default function GiftPage() {
         logEvent('gift_share', { cardId: card.id, channel: 'kakao' });
       } else {
         // 문구와 한마디는 모두 이미지 안에 크게 들어가므로, 텍스트 메시지는 따로 보내지 않는다
-        const result = await shareCardImage(card, { note });
+        const result = await shareCardImage(card, { note, design: fixedDesign });
         logEvent('gift_share', { cardId: card.id, channel: 'share_sheet' });
         if (result === 'downloaded') showToast('카드 이미지를 저장했어요. 카톡에 첨부해 보내주세요!');
       }
@@ -88,7 +92,7 @@ export default function GiftPage() {
     if (busy) return;
     setBusy(true);
     try {
-      const blob = await renderCardImage(card, { note });
+      const blob = await renderCardImage(card, { note, design: fixedDesign });
       const file = new File([blob], 'muziktiger-comfort.png', { type: 'image/png' });
       if (navigator.canShare?.({ files: [file] })) {
         await navigator.share({ files: [file], title: '무직타이거 오늘의 위로' });
@@ -118,7 +122,7 @@ export default function GiftPage() {
         <div className="gift-title">친구에게 선물 🎁</div>
         <div className="gift-sub">오늘의 위로를 소중한 사람에게 전해보세요</div>
 
-        <ComfortCardView card={card} note={note} />
+        <ComfortCardView card={card} note={note} design={fixedDesign} />
 
         <div className="gift-note">
           <label htmlFor="gift-note-input">받는 사람에게 한마디</label>

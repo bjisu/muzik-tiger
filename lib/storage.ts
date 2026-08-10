@@ -1,4 +1,4 @@
-import type { UserComfortState } from './types';
+import type { CardDesign, UserComfortState } from './types';
 
 const KEY = 'mzt_comfort_state_v1';
 
@@ -7,6 +7,7 @@ const DEFAULT_STATE: UserComfortState = {
   streakDays: 0,
   lastVisitDate: '',
   recentCardIds: [],
+  savedDesigns: {},
 };
 
 export function todayStr(d = new Date()): string {
@@ -49,15 +50,24 @@ export function registerVisit(): UserComfortState {
   return state;
 }
 
-/** 카드 저장(중복 방지). 새로 저장되었으면 true. */
-export function saveCard(cardId: string): boolean {
+/**
+ * 카드 저장(중복 방지). 새로 저장되었으면 true.
+ * design을 함께 넘기면 저장 시점의 배경 디자인을 박아둔다(이후 날짜가 바뀌어도 그대로).
+ */
+export function saveCard(cardId: string, design?: CardDesign): boolean {
   const state = getState();
   if (state.savedCardIds.includes(cardId)) return false;
   state.savedCardIds = [cardId, ...state.savedCardIds]; // 최신순
+  if (design) state.savedDesigns = { ...state.savedDesigns, [cardId]: design };
   setState(state);
   return true;
 }
 
 export function isCardSaved(cardId: string): boolean {
   return getState().savedCardIds.includes(cardId);
+}
+
+/** 저장 시점에 박아둔 디자인(없으면 undefined → 날짜 기준 배정) */
+export function savedDesignOf(cardId: string): CardDesign | undefined {
+  return getState().savedDesigns?.[cardId];
 }

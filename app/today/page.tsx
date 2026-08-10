@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import ComfortCardView from '@/components/ComfortCardView';
 import { useToast } from '@/components/Toast';
-import { CATEGORY_KO, pickTodayCard } from '@/lib/cards';
+import { CATEGORY_KO, designKeyOf, pickTodayCard } from '@/lib/cards';
 import { isCardSaved, registerVisit, saveCard } from '@/lib/storage';
 import { logEvent } from '@/lib/analytics';
 import type { ComfortCard } from '@/lib/types';
@@ -29,8 +29,12 @@ export default function TodayPage() {
 
   if (!card) return <main className="today-main" />;
 
+  // 오늘의 디자인 — 날짜+카드 id 시드라 같은 날엔 새로고침해도 그대로
+  const designKey = designKeyOf(card);
+
   const onSave = () => {
-    if (saveCard(card.id)) {
+    // 저장 시점의 디자인을 함께 기록해 컬렉션에서 그 모습 그대로 남긴다
+    if (saveCard(card.id, designKey)) {
       setSaved(true);
       setSavedCount((n) => n + 1);
       logEvent('card_save', { cardId: card.id, category: card.category });
@@ -59,13 +63,16 @@ export default function TodayPage() {
           오늘의 {CATEGORY_KO[card.category]} 한마디
         </div>
 
-        <ComfortCardView card={card} />
+        <ComfortCardView card={card} design={designKey} />
 
         <div className="btn-row">
           <button className={`btn ${saved ? 'btn-saved' : 'btn-ghost'}`} onClick={onSave}>
             {saved ? '저장됨 ✓' : '저장'}
           </button>
-          <button className="btn btn-primary" onClick={() => router.push(`/gift/${card.id}`)}>
+          <button
+            className="btn btn-primary"
+            onClick={() => router.push(`/gift/${card.id}?d=${designKey}`)}
+          >
             선물하기
           </button>
         </div>

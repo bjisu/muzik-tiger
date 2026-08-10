@@ -24,7 +24,9 @@ export interface DesignSpec {
   textTop: number; // 카드 높이 대비 텍스트 영역 시작(비율)
   textBottom: number; // 텍스트 영역 끝(비율)
   ink: string; // 문구 색
-  accent: string; // 날짜·포인트 색
+  accent: string; // 포인트 색(받는 사람 한마디)
+  ribbonY: number; // 아트의 리본 배너 중심(카드 높이 대비) — 날짜를 여기에 얹는다
+  ribbonInk: string; // 리본 위 날짜 글자색
 }
 
 export const DESIGNS: Record<CardDesign, DesignSpec> = {
@@ -36,6 +38,8 @@ export const DESIGNS: Record<CardDesign, DesignSpec> = {
     textBottom: 0.96,
     ink: '#5B4023',
     accent: '#B0713A',
+    ribbonY: 0.803,
+    ribbonInk: '#5B4023',
   },
   forest: {
     key: 'forest',
@@ -45,6 +49,8 @@ export const DESIGNS: Record<CardDesign, DesignSpec> = {
     textBottom: 0.96,
     ink: '#4A3524',
     accent: '#F18400',
+    ribbonY: 0.8195,
+    ribbonInk: '#FFFFFF',
   },
   beach: {
     key: 'beach',
@@ -54,10 +60,16 @@ export const DESIGNS: Record<CardDesign, DesignSpec> = {
     textBottom: 0.92,
     ink: '#33566B',
     accent: '#3D8FB5',
+    ribbonY: 0.781,
+    ribbonInk: '#FFFFFF',
   },
 };
 
 const DESIGN_KEYS: CardDesign[] = ['tradition', 'forest', 'beach'];
+
+export function isCardDesign(v: unknown): v is CardDesign {
+  return typeof v === 'string' && (DESIGN_KEYS as string[]).includes(v);
+}
 
 function hashStr(s: string): number {
   let h = 0;
@@ -65,10 +77,31 @@ function hashStr(s: string): number {
   return h;
 }
 
-/** 카드에 지정된 디자인이 없으면 id 기준으로 고정 배정(항상 같은 디자인) */
-export function designOf(card: ComfortCard): DesignSpec {
-  const key = card.design ?? DESIGN_KEYS[hashStr(card.id) % DESIGN_KEYS.length];
-  return DESIGNS[key];
+/** 디자인 결정 옵션 */
+export interface DesignOpts {
+  /** 저장된 카드·선물 링크로 고정된 디자인(있으면 날짜 배정보다 우선) */
+  design?: CardDesign | null;
+  /** 날짜 배정 기준일(YYYY-MM-DD). 기본값은 오늘 */
+  date?: string;
+}
+
+/**
+ * 카드 배경 디자인 결정 (우선순위)
+ * 1) 카드 데이터에 design이 박혀 있으면 그대로 — 랜덤 배정 대상 아님
+ * 2) 고정된 디자인(저장 시점 기록 / 선물 링크의 ?d=)이 있으면 그것
+ * 3) 없으면 '날짜 + 카드 id' 시드의 결정적 난수 — 같은 날엔 항상 같고, 날짜가 바뀌면 달라진다
+ */
+export function designKeyOf(card: ComfortCard, opts?: DesignOpts): CardDesign {
+  if (card.design) return card.design;
+  if (isCardDesign(opts?.design)) return opts!.design as CardDesign;
+
+  const rand = seededRandom(`design:${opts?.date ?? todayStr()}:${card.id}`);
+  rand(); // 시드 직후 첫 값은 편향이 있어 버린다
+  return DESIGN_KEYS[Math.floor(rand() * DESIGN_KEYS.length) % DESIGN_KEYS.length];
+}
+
+export function designOf(card: ComfortCard, opts?: DesignOpts): DesignSpec {
+  return DESIGNS[designKeyOf(card, opts)];
 }
 
 export function cardById(id: string): ComfortCard | undefined {
@@ -94,10 +127,17 @@ function seededRandom(seed: string): () => number {
   };
 }
 
+/** 요일·시간대가 지정된 카드는 오늘과 맞아떨어질 때만 후보가 된다(지정이 없으면 항상 후보) */
+function fitsNow(card: ComfortCard, weekday: number, slot: Timeslot): boolean {
+  if (card.weekday !== undefined && card.weekday !== weekday) return false;
+  if (card.timeslot !== undefined && card.timeslot !== slot) return false;
+  return true;
+}
+
 /**
  * "오늘의 위로" 선택 로직 (기획서 4.1)
  * 1) 요일 + 시간대 계산  2) 오늘 이미 본 카드가 있으면 재노출
- * 3) 없으면 가중치 + 최근 미노출 조건으로 1장 선정 후 seenToday 저장
+ * 3) 없으면 요일·시간대 하드 필터 → 최근 미노출 → 가중치로 1장 선정 후 seenToday 저장
  */
 export function pickTodayCard(now = new Date()): ComfortCard {
   const state = getState();
@@ -112,8 +152,14 @@ export function pickTodayCard(now = new Date()): ComfortCard {
   const weekday = now.getDay();
   const recent = new Set(state.recentCardIds.slice(0, RECENT_WINDOW));
 
-  let pool = CARDS.filter((c) => !recent.has(c.id));
-  if (pool.length === 0) pool = CARDS;
+  // 요일/시간대가 안 맞는 카드는 아예 제외 — 금요일에 월요일 문구가 나오지 않게
+  const eligible = CARDS.filter((c) => fitsNow(c, weekday, slot));
+  const generic = CARDS.filter((c) => c.weekday === undefined && c.timeslot === undefined);
+
+  let pool = eligible.filter((c) => !recent.has(c.id));
+  if (pool.length === 0) pool = eligible; // 최근 노출 조건만 완화
+  if (pool.length === 0) pool = generic; // 그래도 없으면 지정 없는 일반 카드 전체
+  if (pool.length === 0) pool = CARDS; // 최후 방어
 
   const weighted = pool.map((c) => {
     let w = 1;

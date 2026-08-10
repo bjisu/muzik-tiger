@@ -1,12 +1,12 @@
-import type { ComfortCard } from './types';
+import type { CardDesign, ComfortCard } from './types';
 import { designOf, formatCardDate } from './cards';
 
 /** 캔버스에 카드 이미지(배경 템플릿 + 문구 + 선물 한마디)를 렌더링해 Blob으로 반환 */
 export async function renderCardImage(
   card: ComfortCard,
-  opts?: { note?: string },
+  opts?: { note?: string; design?: CardDesign | null },
 ): Promise<Blob> {
-  const design = designOf(card);
+  const design = designOf(card, { design: opts?.design });
   const img = await loadImage(design.src);
 
   const canvas = document.createElement('canvas');
@@ -38,21 +38,22 @@ export async function renderCardImage(
   const lineHeight = msgSize * 1.5;
   const hasNote = !!opts?.note?.trim();
 
-  // 날짜(yy.mm.dd) — 원본 아트의 '오늘의 한마디' 자리, 문구 바로 위
-  const dateSize = Math.round(W * 0.026);
-  const dateH = dateSize * 1.2;
-  const dateGap = W * 0.012;
+  // 날짜(yy.mm.dd) — 아트의 리본 배너 중심에 얹는다
+  const dateSize = Math.round(W * 0.038);
+  ctx.font = `800 ${dateSize}px ${fontFamily}`;
+  ctx.fillStyle = design.ribbonInk;
+  ctx.textBaseline = 'middle';
+  // 화면(CSS letter-spacing: 0.06em)과 자간을 맞춘다 — 미지원 브라우저는 무시
+  const spaced = ctx as CanvasRenderingContext2D & { letterSpacing?: string };
+  spaced.letterSpacing = '0.06em';
+  ctx.fillText(formatCardDate(), W / 2, H * design.ribbonY + dateSize * 0.06);
+  spaced.letterSpacing = '0px';
+  ctx.textBaseline = 'alphabetic';
 
-  // 날짜 + 문구 블록 — 한마디 유무와 무관하게 항상 같은 좌표(한마디 높이는 계산에서 제외)
+  // 문구 블록 — 한마디 유무와 무관하게 항상 같은 좌표(한마디 높이는 계산에서 제외)
   // 중앙에서 카드 높이의 2%만큼 위로 올린다
-  const blockHeight = dateH + dateGap + lines.length * lineHeight;
+  const blockHeight = lines.length * lineHeight;
   let y = boxCenterY - blockHeight / 2 - H * 0.02;
-
-  ctx.font = `700 ${dateSize}px ${fontFamily}`;
-  ctx.fillStyle = design.accent;
-  y += dateH;
-  ctx.fillText(formatCardDate(), W / 2, y);
-  y += dateGap;
 
   ctx.font = `700 ${msgSize}px ${fontFamily}`;
   ctx.fillStyle = design.ink;
@@ -119,9 +120,9 @@ function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number)
 /** 이미지 파일 공유 — Web Share API 우선, 안 되면 다운로드. 결과: 'shared' | 'downloaded' */
 export async function shareCardImage(
   card: ComfortCard,
-  opts?: { note?: string; text?: string },
+  opts?: { note?: string; text?: string; design?: CardDesign | null },
 ): Promise<'shared' | 'downloaded'> {
-  const blob = await renderCardImage(card, { note: opts?.note });
+  const blob = await renderCardImage(card, { note: opts?.note, design: opts?.design });
   const file = new File([blob], 'muziktiger-comfort.png', { type: 'image/png' });
   // 문구·한마디는 모두 이미지 안에 들어 있으므로, 별도 텍스트는 명시했을 때만 첨부
   const shareData: ShareData = {
