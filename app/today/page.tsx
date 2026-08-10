@@ -76,7 +76,7 @@ export default function TodayPage() {
 
         <div className="btn-row">
           <button className={`btn ${saved ? 'btn-saved' : 'btn-ghost'}`} onClick={onSave}>
-            {saved ? '저장됨 ✓' : '저장'}
+            {saved ? '카드함에 저장됨 ✓' : '내 카드함에 저장'}
           </button>
           <button
             className="btn btn-primary"
