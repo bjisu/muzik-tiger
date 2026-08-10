@@ -31,7 +31,7 @@ export async function renderCardImage(
   ctx.textBaseline = 'alphabetic';
 
   // 문구 줄바꿈
-  const msgSize = Math.round(W * 0.042);
+  const msgSize = Math.round(W * 0.038);
   ctx.font = `700 ${msgSize}px ${fontFamily}`;
   const lines = wrapText(ctx, `“${card.message}”`, maxWidth);
 
@@ -51,9 +51,9 @@ export async function renderCardImage(
   ctx.textBaseline = 'alphabetic';
 
   // 문구 블록 — 한마디 유무와 무관하게 항상 같은 좌표(한마디 높이는 계산에서 제외)
-  // 중앙에서 카드 높이의 2%만큼 위로 올린다
+  // 중앙에서 카드 높이의 1%만큼 위로 올린다(디자인별 미세 조정은 textTop이 담당)
   const blockHeight = lines.length * lineHeight;
-  let y = boxCenterY - blockHeight / 2 - H * 0.02;
+  let y = boxCenterY - blockHeight / 2 - H * 0.01;
 
   ctx.font = `700 ${msgSize}px ${fontFamily}`;
   ctx.fillStyle = design.ink;

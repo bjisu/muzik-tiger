@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import ComfortCardView from '@/components/ComfortCardView';
 import { useToast } from '@/components/Toast';
-import { CATEGORY_KO, designKeyOf, pickTodayCard } from '@/lib/cards';
+import { designKeyOf, pickTodayCard } from '@/lib/cards';
 import { registerVisit, saveCard } from '@/lib/storage';
 import { logEvent } from '@/lib/analytics';
 import type { ComfortCard } from '@/lib/types';
@@ -50,8 +50,7 @@ export default function TodayPage() {
       <header className="top-bar">
         <div className="top-title">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/brand/logo.png" alt="MUZIK TIGER" />
-          오늘의 위로
+          <img src="/brand/logo.png" alt="MUZIK TIGER" className="header-logo" />
         </div>
         <Link href="/collection" className="top-link">
           내 카드 {savedCount > 0 ? `${savedCount}장` : '보기'}
@@ -59,8 +58,18 @@ export default function TodayPage() {
       </header>
 
       <main className="today-main">
-        <div className="today-badge">
-          오늘의 {CATEGORY_KO[card.category]} 한마디
+        <div className="today-title">
+          <div className="caption">Daily Comfort</div>
+          <h1>
+            <span className="deco" aria-hidden>
+              ·
+            </span>
+            오늘의 위로
+            <span className="deco" aria-hidden>
+              ·
+            </span>
+          </h1>
+          <div className="rule" aria-hidden />
         </div>
 
         <ComfortCardView card={card} design={designKey} />

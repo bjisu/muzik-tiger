@@ -6,14 +6,6 @@ export const CARDS: ComfortCard[] = rawCards as ComfortCard[];
 
 const RECENT_WINDOW = 7; // 최근 N장 재노출 방지
 
-export const CATEGORY_KO: Record<ComfortCard['category'], string> = {
-  cheer: '응원',
-  comfort: '위로',
-  encourage: '격려',
-  humor: '유머',
-  remind: '리마인드',
-};
-
 /** 카드 배경 템플릿 정보 — 텍스트 영역 위치는 원본 아트의 '오늘의 한마디' 박스 기준 */
 export interface DesignSpec {
   key: CardDesign;
@@ -32,7 +24,7 @@ export const DESIGNS: Record<CardDesign, DesignSpec> = {
     key: 'tradition',
     label: '한국의 전통',
     src: '/cards/tradition.webp',
-    textTop: 0.835,
+    textTop: 0.7776,
     textBottom: 0.96,
     ink: '#5B4023',
     accent: '#B0713A',
@@ -43,7 +35,7 @@ export const DESIGNS: Record<CardDesign, DesignSpec> = {
     key: 'forest',
     label: '숲속 피크닉',
     src: '/cards/forest.webp',
-    textTop: 0.845,
+    textTop: 0.8098,
     textBottom: 0.96,
     ink: '#4A3524',
     accent: '#F18400',
@@ -54,7 +46,7 @@ export const DESIGNS: Record<CardDesign, DesignSpec> = {
     key: 'beach',
     label: '여름 바닷가',
     src: '/cards/beach.webp',
-    textTop: 0.812,
+    textTop: 0.7976,
     textBottom: 0.92,
     ink: '#33566B',
     accent: '#3D8FB5',
@@ -65,7 +57,7 @@ export const DESIGNS: Record<CardDesign, DesignSpec> = {
     key: 'home',
     label: '포근한 집',
     src: '/cards/home.webp',
-    textTop: 0.838,
+    textTop: 0.7694,
     textBottom: 0.958,
     ink: '#6B4526',
     accent: '#C0762C',
@@ -76,7 +68,7 @@ export const DESIGNS: Record<CardDesign, DesignSpec> = {
     key: 'winter',
     label: '겨울 눈놀이',
     src: '/cards/winter.webp',
-    textTop: 0.812,
+    textTop: 0.8072,
     textBottom: 0.944,
     ink: '#3D6076',
     accent: '#4E8FB0',
@@ -157,20 +149,23 @@ function fitsNow(card: ComfortCard, weekday: number, slot: Timeslot): boolean {
 
 /**
  * "오늘의 위로" 선택 로직 (기획서 4.1)
- * 1) 요일 + 시간대 계산  2) 오늘 이미 본 카드가 있으면 재노출
- * 3) 없으면 요일·시간대 하드 필터 → 최근 미노출 → 가중치로 1장 선정 후 seenToday 저장
+ * 1) 요일 + 시간대 계산
+ * 2) 오늘 이미 본 카드가 있고 그 카드가 지금 조건에도 맞으면 재노출
+ * 3) 아니면 요일·시간대 하드 필터 → 최근 미노출 → 가중치로 1장 선정 후 seenToday 갱신
  */
 export function pickTodayCard(now = new Date()): ComfortCard {
   const state = getState();
   const today = todayStr(now);
+  const slot = timeslotOf(now.getHours());
+  const weekday = now.getDay();
 
   if (state.seenToday?.date === today) {
     const seen = cardById(state.seenToday.cardId);
-    if (seen) return seen;
+    // 조건 검사를 재노출보다 먼저 한다. 안 그러면 예전에 뽑힌 카드가
+    // 요일·시간대 필터를 우회해 계속 나온다(월요일에 "금요일이다!" 노출)
+    if (seen && fitsNow(seen, weekday, slot)) return seen;
   }
 
-  const slot = timeslotOf(now.getHours());
-  const weekday = now.getDay();
   const recent = new Set(state.recentCardIds.slice(0, RECENT_WINDOW));
 
   // 요일/시간대가 안 맞는 카드는 아예 제외 — 금요일에 월요일 문구가 나오지 않게
