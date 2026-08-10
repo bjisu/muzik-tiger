@@ -10,20 +10,8 @@ import { renderCardImage, downloadBlob } from '@/lib/share';
 import { logEvent } from '@/lib/analytics';
 
 const FILE_NAME = 'muziktiger-comfort.png';
-/** 공유 시트에 실리는 제목. 앞뒤 공백이 있으면 카톡에서 빈 줄로 렌더되므로 붙이지 않는다 */
-const SHARE_TITLE = 'MUZIK TIGER 오늘의 위로';
-
-/**
- * iOS는 a[download]로 사진 앱에 저장할 수 없다(새 탭으로 열릴 뿐).
- * 유일한 경로가 공유 시트의 "이미지 저장"이라 저장 버튼도 시트를 띄운다.
- */
-function isIOS(): boolean {
-  if (typeof navigator === 'undefined') return false;
-  return (
-    /iP(hone|ad|od)/.test(navigator.userAgent) ||
-    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
-  );
-}
+/** 공유 시트에 실리는 제목. 카톡에서 여러 줄로 붙지 않도록 이 한 줄만 넘기고 text는 넣지 않는다 */
+const SHARE_TITLE = '무직타이거 오늘의 위로';
 
 /** C-03 선물 공유 — 카드 프리뷰 + 받는 사람 한마디 + 이미지 저장 / OS 공유 (기획서 6) */
 export default function GiftPage() {
@@ -57,24 +45,16 @@ export default function GiftPage() {
     return { blob, file: new File([blob], FILE_NAME, { type: 'image/png' }) };
   };
 
-  /** 이미지 저장하기 — 갤러리(사진 앱)에 저장 */
+  /** 이미지 저장하기 — 공유 시트 없이 바로 다운로드(성공 시 토스트도 띄우지 않는다) */
   const onSave = async () => {
     if (busy) return;
     setBusy(true);
     try {
-      const { blob, file } = await buildImage();
-      if (isIOS() && navigator.canShare?.({ files: [file] })) {
-        showToast('공유 시트에서 “이미지 저장”을 선택해 주세요.');
-        await navigator.share({ files: [file], title: SHARE_TITLE });
-      } else {
-        downloadBlob(blob, FILE_NAME);
-        showToast('이미지를 저장했어요. 갤러리에서 확인해 보세요!');
-      }
+      const { blob } = await buildImage();
+      downloadBlob(blob, FILE_NAME);
       logEvent('gift_share', { cardId: card.id, channel: 'save' });
-    } catch (e) {
-      if ((e as DOMException)?.name !== 'AbortError') {
-        showToast('저장에 실패했어요. 다시 시도해 주세요.');
-      }
+    } catch {
+      showToast('저장에 실패했어요. 다시 시도해 주세요.');
     } finally {
       setBusy(false);
     }

@@ -51,9 +51,10 @@ export async function renderCardImage(
   ctx.textBaseline = 'alphabetic';
 
   // 문구 블록 — 한마디 유무와 무관하게 항상 같은 좌표(한마디 높이는 계산에서 제외)
-  // 중앙에서 카드 높이의 1%만큼 위로 올린다(디자인별 미세 조정은 textTop이 담당)
+  // 중앙에서 카드 높이의 0.5%만큼 아래로 내린다 — 리본에 붙지 않게
+  // (디자인별 미세 조정은 textTop이 담당)
   const blockHeight = lines.length * lineHeight;
-  let y = boxCenterY - blockHeight / 2 - H * 0.01;
+  let y = boxCenterY - blockHeight / 2 + H * 0.005;
 
   ctx.font = `700 ${msgSize}px ${fontFamily}`;
   ctx.fillStyle = design.ink;
@@ -120,15 +121,15 @@ function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number)
 /** 이미지 파일 공유 — Web Share API 우선, 안 되면 다운로드. 결과: 'shared' | 'downloaded' */
 export async function shareCardImage(
   card: ComfortCard,
-  opts?: { note?: string; text?: string; design?: CardDesign | null },
+  opts?: { note?: string; design?: CardDesign | null },
 ): Promise<'shared' | 'downloaded'> {
   const blob = await renderCardImage(card, { note: opts?.note, design: opts?.design });
   const file = new File([blob], 'muziktiger-comfort.png', { type: 'image/png' });
-  // 문구·한마디는 모두 이미지 안에 들어 있으므로, 별도 텍스트는 명시했을 때만 첨부
+  // 문구·한마디는 모두 이미지 안에 들어 있다. text를 넣으면 카톡에서 제목 아래 한 줄이
+  // 더 붙으므로 title 한 줄만 넘긴다.
   const shareData: ShareData = {
     files: [file],
-    title: 'MUZIK TIGER 오늘의 위로',
-    ...(opts?.text ? { text: opts.text } : {}),
+    title: '무직타이거 오늘의 위로',
   };
 
   if (typeof navigator !== 'undefined' && navigator.canShare?.({ files: [file] })) {
