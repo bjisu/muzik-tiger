@@ -1,12 +1,10 @@
-import rawCards from '@/data/comfort-cards.json';
+﻿import rawCards from '@/data/comfort-cards.json';
 import type { CardDesign, ComfortCard, Timeslot } from './types';
 import { getState, setState, todayStr } from './storage';
 
 export const CARDS: ComfortCard[] = rawCards as ComfortCard[];
 
 const RECENT_WINDOW = 7; // 최근 N장 재노출 방지
-
-export const WEEKDAY_KO = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
 
 export const CATEGORY_KO: Record<ComfortCard['category'], string> = {
   cheer: '응원',
@@ -38,7 +36,7 @@ export const DESIGNS: Record<CardDesign, DesignSpec> = {
     textBottom: 0.96,
     ink: '#5B4023',
     accent: '#B0713A',
-    ribbonY: 0.803,
+    ribbonY: 0.7969,
     ribbonInk: '#5B4023',
   },
   forest: {
@@ -49,7 +47,7 @@ export const DESIGNS: Record<CardDesign, DesignSpec> = {
     textBottom: 0.96,
     ink: '#4A3524',
     accent: '#F18400',
-    ribbonY: 0.8195,
+    ribbonY: 0.8163,
     ribbonInk: '#FFFFFF',
   },
   beach: {
@@ -60,12 +58,34 @@ export const DESIGNS: Record<CardDesign, DesignSpec> = {
     textBottom: 0.92,
     ink: '#33566B',
     accent: '#3D8FB5',
-    ribbonY: 0.781,
+    ribbonY: 0.7761,
+    ribbonInk: '#FFFFFF',
+  },
+  home: {
+    key: 'home',
+    label: '포근한 집',
+    src: '/cards/home.webp',
+    textTop: 0.838,
+    textBottom: 0.958,
+    ink: '#6B4526',
+    accent: '#C0762C',
+    ribbonY: 0.7855,
+    ribbonInk: '#FFFFFF',
+  },
+  winter: {
+    key: 'winter',
+    label: '겨울 눈놀이',
+    src: '/cards/winter.webp',
+    textTop: 0.812,
+    textBottom: 0.944,
+    ink: '#3D6076',
+    accent: '#4E8FB0',
+    ribbonY: 0.7999,
     ribbonInk: '#FFFFFF',
   },
 };
 
-const DESIGN_KEYS: CardDesign[] = ['tradition', 'forest', 'beach'];
+const DESIGN_KEYS: CardDesign[] = ['tradition', 'forest', 'beach', 'home', 'winter'];
 
 export function isCardDesign(v: unknown): v is CardDesign {
   return typeof v === 'string' && (DESIGN_KEYS as string[]).includes(v);
@@ -96,7 +116,8 @@ export function designKeyOf(card: ComfortCard, opts?: DesignOpts): CardDesign {
   if (isCardDesign(opts?.design)) return opts!.design as CardDesign;
 
   const rand = seededRandom(`design:${opts?.date ?? todayStr()}:${card.id}`);
-  rand(); // 시드 직후 첫 값은 편향이 있어 버린다
+  // 비슷한 시드(날짜 하루 차이 등)끼리 출력이 붙어 분포가 쏠리므로 초기 값 몇 개는 버린다
+  for (let i = 0; i < 3; i++) rand();
   return DESIGN_KEYS[Math.floor(rand() * DESIGN_KEYS.length) % DESIGN_KEYS.length];
 }
 

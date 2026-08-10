@@ -62,12 +62,3 @@ export function saveCard(cardId: string, design?: CardDesign): boolean {
   setState(state);
   return true;
 }
-
-export function isCardSaved(cardId: string): boolean {
-  return getState().savedCardIds.includes(cardId);
-}
-
-/** 저장 시점에 박아둔 디자인(없으면 undefined → 날짜 기준 배정) */
-export function savedDesignOf(cardId: string): CardDesign | undefined {
-  return getState().savedDesigns?.[cardId];
-}

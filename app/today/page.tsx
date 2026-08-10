@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import ComfortCardView from '@/components/ComfortCardView';
 import { useToast } from '@/components/Toast';
 import { CATEGORY_KO, designKeyOf, pickTodayCard } from '@/lib/cards';
-import { isCardSaved, registerVisit, saveCard } from '@/lib/storage';
+import { registerVisit, saveCard } from '@/lib/storage';
 import { logEvent } from '@/lib/analytics';
 import type { ComfortCard } from '@/lib/types';
 

@@ -39,14 +39,14 @@ export async function renderCardImage(
   const hasNote = !!opts?.note?.trim();
 
   // 날짜(yy.mm.dd) — 아트의 리본 배너 중심에 얹는다
-  const dateSize = Math.round(W * 0.038);
+  const dateSize = Math.round(W * 0.034);
   ctx.font = `800 ${dateSize}px ${fontFamily}`;
   ctx.fillStyle = design.ribbonInk;
   ctx.textBaseline = 'middle';
   // 화면(CSS letter-spacing: 0.06em)과 자간을 맞춘다 — 미지원 브라우저는 무시
   const spaced = ctx as CanvasRenderingContext2D & { letterSpacing?: string };
   spaced.letterSpacing = '0.06em';
-  ctx.fillText(formatCardDate(), W / 2, H * design.ribbonY + dateSize * 0.06);
+  ctx.fillText(formatCardDate(), W / 2, H * design.ribbonY);
   spaced.letterSpacing = '0px';
   ctx.textBaseline = 'alphabetic';
 

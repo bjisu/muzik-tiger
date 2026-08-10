@@ -1,6 +1,6 @@
 export type ComfortCategory = 'cheer' | 'comfort' | 'encourage' | 'humor' | 'remind';
 
-export type CardDesign = 'tradition' | 'forest' | 'beach';
+export type CardDesign = 'tradition' | 'forest' | 'beach' | 'home' | 'winter';
 
 export type Timeslot = 'morning' | 'noon' | 'evening' | 'overtime';
 

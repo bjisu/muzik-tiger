@@ -202,14 +202,6 @@ button {
   animation: riseIn 0.5s ease both;
 }
 
-.today-date {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--point);
-  letter-spacing: 0.08em;
-  margin: 10px 0 4px;
-}
-
 .today-badge {
   display: inline-flex;
   align-items: center;
@@ -262,7 +254,7 @@ button {
   right: 0;
   transform: translateY(-50%);
   text-align: center;
-  font-size: 3.8cqw;
+  font-size: 3.4cqw;
   font-weight: 800;
   letter-spacing: 0.06em;
   line-height: 1;
