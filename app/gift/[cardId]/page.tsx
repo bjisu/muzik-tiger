@@ -5,19 +5,27 @@ import Link from 'next/link';
 import { useParams, useSearchParams } from 'next/navigation';
 import ComfortCardView from '@/components/ComfortCardView';
 import { useToast } from '@/components/Toast';
-import { cardById, designOf, isCardDesign } from '@/lib/cards';
-import { renderCardImage, shareCardImage, downloadBlob } from '@/lib/share';
+import { cardById, isCardDesign } from '@/lib/cards';
+import { renderCardImage, downloadBlob } from '@/lib/share';
 import { logEvent } from '@/lib/analytics';
 
-declare global {
-  interface Window {
-    Kakao?: any;
-  }
+const FILE_NAME = 'muziktiger-comfort.png';
+/** 공유 시트에 실리는 제목. 앞뒤 공백이 있으면 카톡에서 빈 줄로 렌더되므로 붙이지 않는다 */
+const SHARE_TITLE = 'MUZIK TIGER 오늘의 위로';
+
+/**
+ * iOS는 a[download]로 사진 앱에 저장할 수 없다(새 탭으로 열릴 뿐).
+ * 유일한 경로가 공유 시트의 "이미지 저장"이라 저장 버튼도 시트를 띄운다.
+ */
+function isIOS(): boolean {
+  if (typeof navigator === 'undefined') return false;
+  return (
+    /iP(hone|ad|od)/.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+  );
 }
 
-const KAKAO_KEY = process.env.NEXT_PUBLIC_KAKAO_JS_KEY;
-
-/** C-03 선물 공유 — 카드 프리뷰 + 받는 사람 한마디 + 카카오/인스타 공유 (기획서 6) */
+/** C-03 선물 공유 — 카드 프리뷰 + 받는 사람 한마디 + 이미지 저장 / OS 공유 (기획서 6) */
 export default function GiftPage() {
   const params = useParams<{ cardId: string }>();
   const searchParams = useSearchParams();
@@ -33,18 +41,6 @@ export default function GiftPage() {
     if (card) logEvent('gift_open', { cardId: card.id });
   }, [card]);
 
-  // 카카오 SDK 로드(키가 설정된 경우에만)
-  useEffect(() => {
-    if (!KAKAO_KEY || window.Kakao) return;
-    const script = document.createElement('script');
-    script.src = 'https://t1.kakaocdn.net/kakao_js_sdk/2.7.4/kakao.min.js';
-    script.async = true;
-    script.onload = () => {
-      if (window.Kakao && !window.Kakao.isInitialized()) window.Kakao.init(KAKAO_KEY);
-    };
-    document.head.appendChild(script);
-  }, []);
-
   if (!card) {
     return (
       <main className="gift-main" style={{ justifyContent: 'center' }}>
@@ -56,51 +52,48 @@ export default function GiftPage() {
     );
   }
 
-  /** 카카오톡으로 선물하기 — SDK가 있으면 카카오 공유, 없으면 시스템 공유 시트 폴백 */
-  const onKakao = async () => {
+  const buildImage = async () => {
+    const blob = await renderCardImage(card, { note, design: fixedDesign });
+    return { blob, file: new File([blob], FILE_NAME, { type: 'image/png' }) };
+  };
+
+  /** 이미지 저장하기 — 갤러리(사진 앱)에 저장 */
+  const onSave = async () => {
     if (busy) return;
     setBusy(true);
     try {
-      if (KAKAO_KEY && window.Kakao?.isInitialized()) {
-        const url = window.location.href;
-        window.Kakao.Share.sendDefault({
-          objectType: 'feed',
-          content: {
-            title: '무직타이거 오늘의 위로 🧡',
-            description: `“${card.message}”`,
-            imageUrl: new URL(designOf(card, { design: fixedDesign }).src, url).toString(),
-            link: { mobileWebUrl: url, webUrl: url },
-          },
-          buttons: [{ title: '위로 카드 열기', link: { mobileWebUrl: url, webUrl: url } }],
-        });
-        logEvent('gift_share', { cardId: card.id, channel: 'kakao' });
+      const { blob, file } = await buildImage();
+      if (isIOS() && navigator.canShare?.({ files: [file] })) {
+        showToast('공유 시트에서 “이미지 저장”을 선택해 주세요.');
+        await navigator.share({ files: [file], title: SHARE_TITLE });
       } else {
-        // 문구와 한마디는 모두 이미지 안에 크게 들어가므로, 텍스트 메시지는 따로 보내지 않는다
-        const result = await shareCardImage(card, { note, design: fixedDesign });
-        logEvent('gift_share', { cardId: card.id, channel: 'share_sheet' });
-        if (result === 'downloaded') showToast('카드 이미지를 저장했어요. 카톡에 첨부해 보내주세요!');
+        downloadBlob(blob, FILE_NAME);
+        showToast('이미지를 저장했어요. 갤러리에서 확인해 보세요!');
       }
-    } catch {
-      showToast('공유에 실패했어요. 다시 시도해 주세요.');
+      logEvent('gift_share', { cardId: card.id, channel: 'save' });
+    } catch (e) {
+      if ((e as DOMException)?.name !== 'AbortError') {
+        showToast('저장에 실패했어요. 다시 시도해 주세요.');
+      }
     } finally {
       setBusy(false);
     }
   };
 
-  /** 인스타 스토리 공유 — 이미지 파일 공유(사용자가 인스타 선택), 폴백은 이미지 저장 */
-  const onInsta = async () => {
+  /** 공유하기 — OS 기본 공유 시트(카톡·인스타 등은 사용자가 시트에서 고른다) */
+  const onShare = async () => {
     if (busy) return;
     setBusy(true);
     try {
-      const blob = await renderCardImage(card, { note, design: fixedDesign });
-      const file = new File([blob], 'muziktiger-comfort.png', { type: 'image/png' });
+      const { blob, file } = await buildImage();
       if (navigator.canShare?.({ files: [file] })) {
-        await navigator.share({ files: [file], title: '무직타이거 오늘의 위로' });
+        // 문구·한마디가 이미지 안에 들어 있으므로 text는 붙이지 않는다
+        await navigator.share({ files: [file], title: SHARE_TITLE });
       } else {
-        downloadBlob(blob, 'muziktiger-comfort.png');
-        showToast('이미지를 저장했어요. 인스타 스토리에 올려주세요!');
+        downloadBlob(blob, FILE_NAME);
+        showToast('이 브라우저는 공유를 지원하지 않아 이미지를 저장했어요.');
       }
-      logEvent('gift_share', { cardId: card.id, channel: 'instagram' });
+      logEvent('gift_share', { cardId: card.id, channel: 'share_sheet' });
     } catch (e) {
       if ((e as DOMException)?.name !== 'AbortError') {
         showToast('공유에 실패했어요. 다시 시도해 주세요.');
@@ -136,11 +129,11 @@ export default function GiftPage() {
         </div>
 
         <div className="gift-actions">
-          <button className="btn btn-dark" disabled={busy} onClick={onKakao}>
-            {busy ? '카드 만드는 중…' : '카카오톡으로 선물하기'}
+          <button className="btn btn-dark" disabled={busy} onClick={onSave}>
+            {busy ? '카드 만드는 중…' : '이미지 저장하기'}
           </button>
-          <button className="btn btn-ghost" disabled={busy} onClick={onInsta}>
-            인스타 스토리 공유
+          <button className="btn btn-ghost" disabled={busy} onClick={onShare}>
+            공유하기
           </button>
         </div>
       </main>

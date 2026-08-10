@@ -315,7 +315,7 @@ button {
   left: 50%;
   bottom: 1.5cqw;
   transform: translateX(-50%);
-  font-size: 2.8cqw;
+  font-size: 3.1cqw;
   font-weight: 700;
   line-height: 1.6;
   max-width: 96%; /* .card-overlay 폭(카드의 78%) 기준 → 카드 폭의 약 75% */

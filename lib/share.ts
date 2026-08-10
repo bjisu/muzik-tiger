@@ -64,7 +64,7 @@ export async function renderCardImage(
 
   // 받는 사람 한마디 — 문구 흐름과 무관하게 텍스트 박스 하단 경계 위 고정 좌표에 그린다
   if (hasNote) {
-    const noteSize = Math.round(W * 0.028);
+    const noteSize = Math.round(W * 0.031);
     const noteLineH = Math.round(noteSize * 1.6);
     const maxNoteW = W * 0.75;
 
@@ -127,7 +127,7 @@ export async function shareCardImage(
   // 문구·한마디는 모두 이미지 안에 들어 있으므로, 별도 텍스트는 명시했을 때만 첨부
   const shareData: ShareData = {
     files: [file],
-    title: '무직타이거 오늘의 위로',
+    title: 'MUZIK TIGER 오늘의 위로',
     ...(opts?.text ? { text: opts.text } : {}),
   };
 
