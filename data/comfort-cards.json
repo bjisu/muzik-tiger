@@ -1,62 +1,320 @@
 [
-  { "id": "c001", "message": "오늘도 애썼어, 딱 이만큼만 하면 돼.", "category": "cheer" },
-  { "id": "c002", "message": "천천히 가도 돼. 방향이 맞으면 충분해.", "category": "cheer" },
-  { "id": "c003", "message": "너 오늘 좀 멋있었어. 진짜야.", "category": "cheer" },
-  { "id": "c004", "message": "시작한 것만으로 이미 반은 온 거야.", "category": "cheer" },
-  { "id": "c005", "message": "오늘의 너는 어제의 너보다 한 뼘 컸어.", "category": "cheer" },
-  { "id": "c006", "message": "잘하고 있어. 의심하지 마.", "category": "cheer" },
-  { "id": "c007", "message": "네 속도가 제일 좋은 속도야.", "category": "cheer" },
-  { "id": "c008", "message": "안 되면 어때, 되게 하면 되지.", "category": "cheer" },
-  { "id": "c009", "message": "오늘은 네가 주인공이야.", "category": "cheer" },
-  { "id": "c010", "message": "한 걸음이면 충분해. 그게 오늘 몫이야.", "category": "cheer" },
-  { "id": "c011", "message": "쉬어가도 괜찮아. 넌 충분히 잘하고 있어.", "category": "comfort" },
-  { "id": "c012", "message": "힘든 날엔 힘들다고 말해도 돼.", "category": "comfort" },
-  { "id": "c013", "message": "오늘 하루, 버틴 것만으로 대단해.", "category": "comfort" },
-  { "id": "c014", "message": "네 잘못이 아니야. 그냥 그런 날이 있는 거야.", "category": "comfort" },
-  { "id": "c015", "message": "울고 싶으면 울어. 그다음엔 간식 먹자.", "category": "comfort" },
-  { "id": "c016", "message": "완벽하지 않아도 충분히 사랑받을 수 있어.", "category": "comfort" },
-  { "id": "c017", "message": "지친 건 그만큼 열심히 살았다는 증거야.", "category": "comfort" },
-  { "id": "c018", "message": "괜찮아, 내일의 너는 또 다를 거야.", "category": "comfort" },
-  { "id": "c019", "message": "마음이 무거운 날엔 기지개 한 번, 몸부터 가볍게.", "category": "comfort" },
-  { "id": "c020", "message": "누가 뭐래도 나는 네 편이야.", "category": "comfort" },
-  { "id": "c021", "message": "실수해도 돼. 호랑이도 가끔 미끄러져.", "category": "encourage" },
-  { "id": "c022", "message": "지금 막막한 건 네가 성장하는 중이라서 그래.", "category": "encourage" },
-  { "id": "c023", "message": "포기 말고 잠깐 멈춤. 그거면 돼.", "category": "encourage" },
-  { "id": "c024", "message": "어제 못 한 건 오늘 하면 돼.", "category": "encourage" },
-  { "id": "c025", "message": "겁이 나는 건 네가 진심이라는 뜻이야.", "category": "encourage" },
-  { "id": "c026", "message": "넘어진 김에 하늘 한 번 보고 가자.", "category": "encourage" },
-  { "id": "c027", "message": "네가 견딘 시간들이 너를 지켜줄 거야.", "category": "encourage" },
-  { "id": "c028", "message": "느려도 멈추지 않으면 도착해.", "category": "encourage" },
-  { "id": "c029", "message": "오늘의 작은 용기가 내일의 큰 힘이 돼.", "category": "encourage" },
-  { "id": "c030", "message": "처음이라 무서운 게 당연해. 그래도 넌 할 거잖아.", "category": "encourage" },
-  { "id": "c031", "message": "월요일이 무서운 게 아니라, 월요일이 날 무서워해야지.", "category": "humor", "weekday": 1 },
-  { "id": "c032", "message": "출근했으면 오늘 할 일 절반은 끝난 거야.", "category": "humor", "timeslot": "morning" },
-  { "id": "c033", "message": "간식은 죄가 없어. 먹자.", "category": "humor" },
-  { "id": "c034", "message": "고민은 배송비도 안 드는데 왜 쌓아둬? 반품하자.", "category": "humor" },
-  { "id": "c035", "message": "오늘의 운세: 귀여운 호랑이를 봤으니 만사형통.", "category": "humor" },
-  { "id": "c036", "message": "열심히 안 살아도 돼. 열심히 귀여우면 돼.", "category": "humor" },
-  { "id": "c037", "message": "퇴근이 답이다. 그런데 문제가 뭐였더라?", "category": "humor", "timeslot": "evening" },
-  { "id": "c038", "message": "물 한 잔 마시자. 오늘의 자기관리 끝.", "category": "humor" },
-  { "id": "c039", "message": "침대가 부르는 소리 들려? 환청 아니야.", "category": "humor", "timeslot": "overtime" },
-  { "id": "c040", "message": "걱정 총량제 실시 중. 오늘 치는 다 썼어.", "category": "humor" },
-  { "id": "c041", "message": "어깨 펴고, 숨 한 번 크게. 지금 바로.", "category": "remind" },
-  { "id": "c042", "message": "물 마신 지 오래됐지? 한 잔 하고 오자.", "category": "remind" },
-  { "id": "c043", "message": "눈 감고 10초. 모니터도 너도 쉬는 시간.", "category": "remind" },
-  { "id": "c044", "message": "점심 대충 먹지 마. 너는 소중하니까.", "category": "remind", "timeslot": "noon" },
-  { "id": "c045", "message": "오늘 잘한 일 하나만 떠올려 봐. 분명 있어.", "category": "remind", "timeslot": "evening" },
-  { "id": "c046", "message": "스트레칭 한 번이 커피 한 잔보다 나을 때가 있어.", "category": "remind" },
-  { "id": "c047", "message": "휴대폰 말고 하늘 한 번 보기. 오늘의 미션.", "category": "remind" },
-  { "id": "c048", "message": "야근 중이라면 무리하지 말자. 내일의 너에게 빌리는 힘이야.", "category": "remind", "timeslot": "overtime" },
-  { "id": "c049", "message": "허리 펴! 뚱랑이랑 한 약속이야.", "category": "remind" },
-  { "id": "c050", "message": "일찍 자는 게 최고의 재테크야.", "category": "remind", "timeslot": "overtime" },
-  { "id": "c051", "message": "좋은 아침! 오늘 치 행운 배달 왔어.", "category": "cheer", "timeslot": "morning" },
-  { "id": "c052", "message": "아침 거르지 마. 호랑이 기운은 밥심에서 나와.", "category": "remind", "timeslot": "morning" },
-  { "id": "c053", "message": "점심 뭐 먹지? 그게 오늘 제일 중요한 회의야.", "category": "humor", "timeslot": "noon" },
-  { "id": "c054", "message": "오늘 하루도 무사히. 그거면 충분해.", "category": "comfort", "timeslot": "evening" },
-  { "id": "c055", "message": "퇴근길엔 좋아하는 노래 크게 듣기.", "category": "cheer", "timeslot": "evening" },
-  { "id": "c056", "message": "이 시간까지 애쓰는 너, 진짜 대단한 거 알지?", "category": "comfort", "timeslot": "overtime" },
-  { "id": "c057", "message": "금요일이다! 오늘은 웃는 근육만 쓰자.", "category": "humor", "weekday": 5 },
-  { "id": "c058", "message": "월요일의 너에게 호랑이 기운 가득.", "category": "cheer", "weekday": 1 },
-  { "id": "c059", "message": "오늘은 아무것도 안 하기에 성공하는 날.", "category": "humor", "weekday": 6 },
-  { "id": "c060", "message": "내일 걱정은 내일의 나에게 맡기고, 오늘은 푹 쉬자.", "category": "comfort", "weekday": 0 }
+  {
+    "id": "c001",
+    "message": "오늘의 너, 생각보다 훨씬 잘하고 있어",
+    "category": "cheer"
+  },
+  {
+    "id": "c002",
+    "message": "네가 웃으면 호랑이도 힘이 나",
+    "category": "cheer"
+  },
+  {
+    "id": "c003",
+    "message": "대단한 하루가 아니어도 돼. 네가 있는 하루면 충분해",
+    "category": "cheer"
+  },
+  {
+    "id": "c004",
+    "message": "어제의 너보다 딱 반 걸음만 앞으로. 그거면 성공이야",
+    "category": "cheer"
+  },
+  {
+    "id": "c005",
+    "message": "너의 페이스대로 가. 결승선은 안 도망가",
+    "category": "cheer"
+  },
+  {
+    "id": "c006",
+    "message": "넌 생각보다 강하고, 생각보다 귀여워",
+    "category": "cheer"
+  },
+  {
+    "id": "c007",
+    "message": "오늘 하루도 네 편에서 응원 중이야",
+    "category": "cheer"
+  },
+  {
+    "id": "c008",
+    "message": "잘될 사람은 잘돼. 그게 너야",
+    "category": "cheer"
+  },
+  {
+    "id": "c009",
+    "message": "지금 이 순간에도 넌 자라는 중이야",
+    "category": "cheer"
+  },
+  {
+    "id": "c010",
+    "message": "좋은 아침! 오늘은 어제보다 조금 더 가벼울 거야",
+    "category": "cheer",
+    "timeslot": "morning"
+  },
+  {
+    "id": "c011",
+    "message": "집 가는 길, 오늘의 너에게 박수 짝짝",
+    "category": "cheer",
+    "timeslot": "evening"
+  },
+  {
+    "id": "c012",
+    "message": "새로운 한 주, 호랑이 등에 올라탄 기분으로 가보자",
+    "category": "cheer",
+    "weekday": 1
+  },
+  {
+    "id": "c013",
+    "message": "괜찮아, 오늘은 오늘만큼만 살면 돼",
+    "category": "comfort"
+  },
+  {
+    "id": "c014",
+    "message": "애쓴 마음은 사라지지 않아. 다 쌓이고 있어",
+    "category": "comfort"
+  },
+  {
+    "id": "c015",
+    "message": "모두에게 좋은 사람일 필요 없어. 너한테 좋은 사람이면 돼",
+    "category": "comfort"
+  },
+  {
+    "id": "c016",
+    "message": "조금 느려도 괜찮아. 쉬는 것도 앞으로 가는 방법이야",
+    "category": "comfort"
+  },
+  {
+    "id": "c017",
+    "message": "오늘 눈물이 났다면, 그만큼 진심이었다는 거야",
+    "category": "comfort"
+  },
+  {
+    "id": "c018",
+    "message": "버거운 날엔 반만 하자. 나머지 반은 내일의 몫",
+    "category": "comfort"
+  },
+  {
+    "id": "c019",
+    "message": "너의 하루가 조용히 안아주고 싶은 하루였길",
+    "category": "comfort"
+  },
+  {
+    "id": "c020",
+    "message": "힘내라는 말 대신, 옆에 있을게",
+    "category": "comfort"
+  },
+  {
+    "id": "c021",
+    "message": "세상이 뭐라 해도 너는 이미 충분한 사람이야",
+    "category": "comfort"
+  },
+  {
+    "id": "c022",
+    "message": "마음에도 정기휴일이 필요해. 오늘이 그날이야",
+    "category": "comfort",
+    "weekday": 0
+  },
+  {
+    "id": "c023",
+    "message": "오늘 하루 무사히 건너온 너, 정말 고생했어",
+    "category": "comfort",
+    "timeslot": "evening"
+  },
+  {
+    "id": "c024",
+    "message": "늦은 밤까지 깨어 있는 너에게, 이불처럼 포근한 내일이 오길",
+    "category": "comfort",
+    "timeslot": "overtime"
+  },
+  {
+    "id": "c025",
+    "message": "두려운 건 네가 앞으로 가고 있다는 신호야",
+    "category": "encourage"
+  },
+  {
+    "id": "c026",
+    "message": "완벽한 시작은 없어. 시작한 사람만 있을 뿐",
+    "category": "encourage"
+  },
+  {
+    "id": "c027",
+    "message": "오늘 안 풀린 건 내일 풀라고 남겨둔 거야",
+    "category": "encourage"
+  },
+  {
+    "id": "c028",
+    "message": "넘어진 자리 말고, 다시 일어난 횟수를 세자",
+    "category": "encourage"
+  },
+  {
+    "id": "c029",
+    "message": "못하는 게 아니라 아직 안 해본 것뿐이야",
+    "category": "encourage"
+  },
+  {
+    "id": "c030",
+    "message": "큰 산도 한 걸음씩 오르면 언덕이 돼",
+    "category": "encourage"
+  },
+  {
+    "id": "c031",
+    "message": "흔들리는 건 뿌리가 자라는 중이라서 그래",
+    "category": "encourage"
+  },
+  {
+    "id": "c032",
+    "message": "남과 비교하지 마. 어제의 너랑만 비교해",
+    "category": "encourage"
+  },
+  {
+    "id": "c033",
+    "message": "실패는 끝이 아니라 데이터야. 넌 더 똑똑해졌어",
+    "category": "encourage"
+  },
+  {
+    "id": "c034",
+    "message": "지금의 고민이 미래의 너를 단단하게 만들 거야",
+    "category": "encourage"
+  },
+  {
+    "id": "c035",
+    "message": "오늘 하루를 여는 너에게, 시작 버튼은 이미 눌렀어",
+    "category": "encourage",
+    "timeslot": "morning"
+  },
+  {
+    "id": "c036",
+    "message": "오후도 가보자. 반은 이미 왔잖아",
+    "category": "encourage",
+    "timeslot": "noon"
+  },
+  {
+    "id": "c037",
+    "message": "걱정도 유통기한이 있대. 오늘 치는 폐기하자",
+    "category": "humor"
+  },
+  {
+    "id": "c038",
+    "message": "귀찮음도 재능이야. 넌 아주 천재적이지",
+    "category": "humor"
+  },
+  {
+    "id": "c039",
+    "message": "통장은 가벼워도 마음만은 뚱랑이처럼",
+    "category": "humor"
+  },
+  {
+    "id": "c040",
+    "message": "세상에서 제일 무거운 건 아침 이불이야. 그걸 들췄다니 대단해",
+    "category": "humor",
+    "timeslot": "morning"
+  },
+  {
+    "id": "c041",
+    "message": "오늘의 목표: 숨쉬기 완료. 이미 달성했네?",
+    "category": "humor"
+  },
+  {
+    "id": "c042",
+    "message": "스트레스는 반품 불가라서, 애초에 안 받는 게 이득이야",
+    "category": "humor"
+  },
+  {
+    "id": "c043",
+    "message": "고양이도 하루 16시간 자. 네 낮잠은 과학이야",
+    "category": "humor"
+  },
+  {
+    "id": "c044",
+    "message": "참는 자에게 복이 온다는데, 간식이 더 빨리 와",
+    "category": "humor"
+  },
+  {
+    "id": "c045",
+    "message": "밥은 먹고 다니자. 오늘 최고의 업무는 점심 완식",
+    "category": "humor",
+    "timeslot": "noon"
+  },
+  {
+    "id": "c046",
+    "message": "퇴근길 발걸음, 세상에서 제일 가벼운 운동이야",
+    "category": "humor",
+    "timeslot": "evening"
+  },
+  {
+    "id": "c047",
+    "message": "불금이다! 오늘 저녁은 네 마음대로 해도 되는 날",
+    "category": "humor",
+    "weekday": 5
+  },
+  {
+    "id": "c048",
+    "message": "토요일 공식 일정: 뒹굴기, 먹기, 또 뒹굴기",
+    "category": "humor",
+    "weekday": 6
+  },
+  {
+    "id": "c049",
+    "message": "물 한 잔, 지금 바로. 뚱랑이랑 약속",
+    "category": "remind"
+  },
+  {
+    "id": "c050",
+    "message": "어깨에 힘 빼고, 후— 하고 숨 한 번",
+    "category": "remind"
+  },
+  {
+    "id": "c051",
+    "message": "화면에서 눈 떼고, 먼 곳 10초 바라보기",
+    "category": "remind"
+  },
+  {
+    "id": "c052",
+    "message": "오늘 고마웠던 일 하나만 떠올려 보기",
+    "category": "remind"
+  },
+  {
+    "id": "c053",
+    "message": "'괜찮아'라고 소리 내서 말해보기. 진짜 효과 있어",
+    "category": "remind"
+  },
+  {
+    "id": "c054",
+    "message": "단 걸 조금 먹어도 되는 날이야. 오늘이 그날",
+    "category": "remind"
+  },
+  {
+    "id": "c055",
+    "message": "창문 열고 새 공기 한 모금. 방도 너도 환기가 필요해",
+    "category": "remind"
+  },
+  {
+    "id": "c056",
+    "message": "아침의 나에게 인사 한마디: 오늘도 잘 부탁해",
+    "category": "remind",
+    "timeslot": "morning"
+  },
+  {
+    "id": "c057",
+    "message": "점심 먹고 5분 산책, 오후가 달라져",
+    "category": "remind",
+    "timeslot": "noon"
+  },
+  {
+    "id": "c058",
+    "message": "오늘의 일은 오늘 서랍에 넣고 잠그기. 이제 퇴근!",
+    "category": "remind",
+    "timeslot": "evening"
+  },
+  {
+    "id": "c059",
+    "message": "자기 전엔 휴대폰 말고, 좋아하는 상상 하나 하기",
+    "category": "remind",
+    "timeslot": "overtime"
+  },
+  {
+    "id": "c060",
+    "message": "이 시간엔 '열심히'보다 '무사히'가 먼저야. 슬슬 마무리하자",
+    "category": "remind",
+    "timeslot": "overtime"
+  }
 ]

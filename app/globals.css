@@ -567,8 +567,8 @@ button {
 .toast {
   position: fixed;
   left: 50%;
-  bottom: 34px;
-  transform: translateX(-50%);
+  top: 50%;
+  transform: translate(-50%, -50%);
   background: rgba(32, 26, 20, 0.92);
   color: #fff;
   font-size: 13.5px;
@@ -577,5 +577,16 @@ button {
   border-radius: 999px;
   z-index: 100;
   white-space: nowrap;
-  animation: riseIn 0.25s ease both;
+  animation: toastIn 0.25s ease both;
+}
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, calc(-50% + 8px));
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
 }

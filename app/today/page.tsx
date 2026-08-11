@@ -38,7 +38,6 @@ export default function TodayPage() {
       setSaved(true);
       setSavedCount((n) => n + 1);
       logEvent('card_save', { cardId: card.id, category: card.category });
-      showToast('컬렉션에 저장했어요!');
     } else {
       setSaved(true);
       showToast('이미 저장된 카드예요.');

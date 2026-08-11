@@ -184,9 +184,10 @@ export function pickTodayCard(now = new Date()): ComfortCard {
     return { card: c, w };
   });
 
-  const rand = seededRandom(today + ':' + slot);
+  // 날짜 시드가 아니라 실제 난수 — 캐시를 지우고 다시 들어오면 다른 카드가 나온다.
+  // 같은 브라우저에서 하루 한 장 고정은 seenToday(로컬 저장)가 담당한다.
   const total = weighted.reduce((sum, x) => sum + x.w, 0);
-  let r = rand() * total;
+  let r = Math.random() * total;
   let picked = weighted[weighted.length - 1].card;
   for (const x of weighted) {
     r -= x.w;
