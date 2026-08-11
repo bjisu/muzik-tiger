@@ -110,6 +110,67 @@ button {
   animation: tigerFloat 3s ease-in-out infinite;
 }
 
+/* 배경 장식용 클로버 — 각자 다른 크기·투명도·속도 */
+.splash-clover {
+  position: absolute;
+  line-height: 1;
+  pointer-events: none;
+  animation: cloverRise 7s ease-in-out infinite;
+}
+
+.splash-clover.c1 {
+  left: -6%;
+  top: 14%;
+  font-size: 18px;
+  opacity: 0.55;
+  animation-duration: 6.5s;
+}
+.splash-clover.c2 {
+  right: -4%;
+  top: 30%;
+  font-size: 13px;
+  opacity: 0.42;
+  animation-duration: 8.5s;
+  animation-delay: -1.4s;
+}
+.splash-clover.c3 {
+  left: 6%;
+  bottom: 6%;
+  font-size: 20px;
+  opacity: 0.48;
+  animation-duration: 7.5s;
+  animation-delay: -3.2s;
+}
+.splash-clover.c4 {
+  right: 8%;
+  bottom: 12%;
+  font-size: 12px;
+  opacity: 0.7;
+  animation-duration: 9.5s;
+  animation-delay: -0.6s;
+}
+.splash-clover.c5 {
+  right: 22%;
+  top: -4%;
+  font-size: 15px;
+  opacity: 0.4;
+  animation-duration: 8s;
+  animation-delay: -2.5s;
+}
+
+/* 천천히 떠오르며 살짝 회전 */
+@keyframes cloverRise {
+  0% {
+    transform: translateY(6px) rotate(-8deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(8deg);
+  }
+  100% {
+    transform: translateY(6px) rotate(-8deg);
+  }
+}
+
 /* 위아래로 아주 살짝 떠다니는 정도 */
 @keyframes tigerFloat {
   0%,
