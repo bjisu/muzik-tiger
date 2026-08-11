@@ -17,7 +17,8 @@ export interface UserComfortState {
   savedCardIds: string[];
   streakDays: number; // 연속 접속일
   lastVisitDate: string; // YYYY-MM-DD
-  seenToday?: { date: string; cardId: string };
+  /** 오늘 뽑힌 카드 — design까지 함께 박아 하루 동안 배경도 그대로 유지한다 */
+  seenToday?: { date: string; cardId: string; design?: CardDesign };
   recentCardIds: string[]; // 최근 노출 카드(재노출 방지)
   /** 저장 시점에 보였던 배경 디자인 — 나중에 날짜가 바뀌어도 그 모습 그대로 유지 */
   savedDesigns: Record<string, CardDesign>;

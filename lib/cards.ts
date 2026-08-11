@@ -147,13 +147,20 @@ function fitsNow(card: ComfortCard, weekday: number, slot: Timeslot): boolean {
   return true;
 }
 
+/** 오늘 노출할 카드와 그 배경 */
+export interface TodayPick {
+  card: ComfortCard;
+  design: CardDesign;
+}
+
 /**
  * "오늘의 위로" 선택 로직 (기획서 4.1)
  * 1) 요일 + 시간대 계산
- * 2) 오늘 이미 본 카드가 있고 그 카드가 지금 조건에도 맞으면 재노출
- * 3) 아니면 요일·시간대 하드 필터 → 최근 미노출 → 가중치로 1장 선정 후 seenToday 갱신
+ * 2) 오늘 이미 본 카드가 있고 그 카드가 지금 조건에도 맞으면 배경까지 그대로 재노출
+ * 3) 아니면 요일·시간대 하드 필터 → 최근 미노출 → 가중치로 1장 선정,
+ *    배경도 함께 뽑아 seenToday에 박아둔다
  */
-export function pickTodayCard(now = new Date()): ComfortCard {
+export function pickTodayCard(now = new Date()): TodayPick {
   const state = getState();
   const today = todayStr(now);
   const slot = timeslotOf(now.getHours());
@@ -163,7 +170,15 @@ export function pickTodayCard(now = new Date()): ComfortCard {
     const seen = cardById(state.seenToday.cardId);
     // 조건 검사를 재노출보다 먼저 한다. 안 그러면 예전에 뽑힌 카드가
     // 요일·시간대 필터를 우회해 계속 나온다(월요일에 "금요일이다!" 노출)
-    if (seen && fitsNow(seen, weekday, slot)) return seen;
+    if (seen && fitsNow(seen, weekday, slot)) {
+      const kept = state.seenToday.design;
+      if (isCardDesign(kept)) return { card: seen, design: kept };
+      // 배경 기록 이전 버전의 상태 — 지금 한 번 뽑아 박아둔다
+      const design = pickDesign(seen);
+      state.seenToday = { date: today, cardId: seen.id, design };
+      setState(state);
+      return { card: seen, design };
+    }
   }
 
   const recent = new Set(state.recentCardIds.slice(0, RECENT_WINDOW));
@@ -197,13 +212,20 @@ export function pickTodayCard(now = new Date()): ComfortCard {
     }
   }
 
-  state.seenToday = { date: today, cardId: picked.id };
+  const design = pickDesign(picked);
+  state.seenToday = { date: today, cardId: picked.id, design };
   state.recentCardIds = [picked.id, ...state.recentCardIds.filter((id) => id !== picked.id)].slice(
     0,
     RECENT_WINDOW,
   );
   setState(state);
-  return picked;
+  return { card: picked, design };
+}
+
+/** 오늘 노출용 배경 뽑기 — 카드에 디자인이 박혀 있으면 그것, 아니면 실제 난수 */
+function pickDesign(card: ComfortCard): CardDesign {
+  if (card.design) return card.design;
+  return DESIGN_KEYS[Math.floor(Math.random() * DESIGN_KEYS.length) % DESIGN_KEYS.length];
 }
 
 /** 카드에 찍히는 날짜 — yy.mm.dd */

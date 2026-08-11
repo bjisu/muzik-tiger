@@ -5,32 +5,33 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import ComfortCardView from '@/components/ComfortCardView';
 import { useToast } from '@/components/Toast';
-import { designKeyOf, pickTodayCard } from '@/lib/cards';
+import { pickTodayCard } from '@/lib/cards';
 import { registerVisit, saveCard } from '@/lib/storage';
 import { logEvent } from '@/lib/analytics';
-import type { ComfortCard } from '@/lib/types';
+import type { CardDesign, ComfortCard } from '@/lib/types';
 
 /** C-01 오늘의 위로 — 하루 한 장, 저장·선물 (기획서 4) */
 export default function TodayPage() {
   const router = useRouter();
   const [card, setCard] = useState<ComfortCard | null>(null);
+  const [designKey, setDesignKey] = useState<CardDesign | null>(null);
   const [saved, setSaved] = useState(false);
   const [savedCount, setSavedCount] = useState(0);
   const [toast, showToast] = useToast();
 
   useEffect(() => {
     const state = registerVisit();
-    const picked = pickTodayCard();
+    const { card: picked, design } = pickTodayCard();
     setCard(picked);
+    setDesignKey(design);
     setSaved(state.savedCardIds.includes(picked.id));
     setSavedCount(state.savedCardIds.length);
     logEvent('card_view', { cardId: picked.id, category: picked.category });
   }, []);
 
-  if (!card) return <main className="today-main" />;
-
-  // 오늘의 디자인 — 날짜+카드 id 시드라 같은 날엔 새로고침해도 그대로
-  const designKey = designKeyOf(card);
+  // 오늘의 디자인은 카드와 함께 뽑혀 seenToday에 저장된다 —
+  // 같은 날 새로고침엔 그대로, 저장소를 비우고 다시 들어오면 카드·배경 모두 새로 뽑힌다
+  if (!card || !designKey) return <main className="today-main" />;
 
   const onSave = () => {
     // 저장 시점의 디자인을 함께 기록해 컬렉션에서 그 모습 그대로 남긴다
@@ -81,7 +82,7 @@ export default function TodayPage() {
             className="btn btn-primary"
             onClick={() => router.push(`/gift/${card.id}?d=${designKey}`)}
           >
-            선물하기
+            공유하기
           </button>
         </div>
 
