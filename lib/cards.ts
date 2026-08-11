@@ -156,8 +156,8 @@ export interface TodayPick {
 /**
  * "오늘의 위로" 선택 로직 (기획서 4.1)
  * 1) 요일 + 시간대 계산
- * 2) 오늘 이미 본 카드가 있고 그 카드가 지금 조건에도 맞으면 배경까지 그대로 재노출
- * 3) 아니면 요일·시간대 하드 필터 → 최근 미노출 → 가중치로 1장 선정,
+ * 2) 오늘 뽑아둔 카드가 있으면 배경까지 그대로 재노출 — 카드는 자정에만 바뀐다
+ * 3) 없으면 요일·시간대 하드 필터 → 최근 미노출 → 가중치로 1장 선정,
  *    배경도 함께 뽑아 seenToday에 박아둔다
  */
 export function pickTodayCard(now = new Date()): TodayPick {
@@ -166,11 +166,13 @@ export function pickTodayCard(now = new Date()): TodayPick {
   const slot = timeslotOf(now.getHours());
   const weekday = now.getDay();
 
+  // 날짜만 보고 재노출한다. 시간대가 바뀌었다고 카드를 다시 뽑으면
+  // 하루에도 여러 번 카드가 바뀐다(오전에 본 카드가 저녁에 교체됨).
+  // 날짜가 다르면 애초에 이 분기를 타지 않으므로, 예전 카드가 요일 필터를
+  // 우회해 계속 나오는 문제(월요일에 "금요일이다!")도 그대로 막힌다.
   if (state.seenToday?.date === today) {
     const seen = cardById(state.seenToday.cardId);
-    // 조건 검사를 재노출보다 먼저 한다. 안 그러면 예전에 뽑힌 카드가
-    // 요일·시간대 필터를 우회해 계속 나온다(월요일에 "금요일이다!" 노출)
-    if (seen && fitsNow(seen, weekday, slot)) {
+    if (seen) {
       const kept = state.seenToday.design;
       if (isCardDesign(kept)) return { card: seen, design: kept };
       // 배경 기록 이전 버전의 상태 — 지금 한 번 뽑아 박아둔다
