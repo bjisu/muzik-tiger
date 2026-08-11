@@ -11,3 +11,6 @@ muzik-comfort/
 
 # 카드 아트 원본(webp로 변환해 public/cards에 커밋). 로컬 보관용
 assets/cards-src/
+
+# 브랜드 아트 원본(webp로 변환해 public/brand에 커밋). 로컬 보관용
+assets/brand-src/

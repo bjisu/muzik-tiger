@@ -72,7 +72,9 @@ export default function TodayPage() {
           <div className="rule" aria-hidden />
         </div>
 
-        <ComfortCardView card={card} design={designKey} />
+        <div className="card-enter">
+          <ComfortCardView card={card} design={designKey} />
+        </div>
 
         <div className="btn-row">
           <button className={`btn ${saved ? 'btn-saved' : 'btn-ghost'}`} onClick={onSave}>
@@ -86,7 +88,7 @@ export default function TodayPage() {
           </button>
         </div>
 
-        <p className="today-hint">내일 또 새로운 한마디가 도착해요 🧡</p>
+        <p className="today-hint">내일 또 새로운 위로가 도착해요 🧡</p>
       </main>
       {toast}
     </>
