@@ -79,8 +79,8 @@ function loadImage(src: string): Promise<HTMLImageElement> {
  * 카카오톡 등 공유 시트의 text(카카오 SDK를 쓰게 되면 description도 이 규칙)로 쓴다.
  */
 export function buildShareText(note?: string): string {
-  const trimmed = note?.trim();
-  return trimmed ? `MUZIK TIGER 오늘의 위로\n${trimmed}` : 'MUZIK TIGER 오늘의 위로';
+  // 한마디가 비면 줄바꿈 자체가 안 붙고, 마지막 trim으로 앞뒤 공백·줄바꿈을 확실히 제거
+  return ['MUZIK TIGER 오늘의 위로', note?.trim()].filter(Boolean).join('\n').trim();
 }
 
 /** 이미지 파일 공유 — Web Share API 우선, 안 되면 다운로드. 결과: 'shared' | 'downloaded' */
