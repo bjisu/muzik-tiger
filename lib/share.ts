@@ -19,9 +19,6 @@ export async function renderCardImage(
 
   const W = canvas.width;
   const H = canvas.height;
-  const boxTop = H * design.textTop;
-  const boxBottom = H * design.textBottom;
-  const boxCenterY = (boxTop + boxBottom) / 2;
   const maxWidth = W * 0.72;
 
   const fontFamily =
@@ -30,12 +27,12 @@ export async function renderCardImage(
   ctx.textAlign = 'center';
   ctx.textBaseline = 'alphabetic';
 
-  // 문구 줄바꿈
+  // 문구 줄바꿈 — 점선이 2개뿐이라 최대 2줄. 넘치면 나머지는 둘째 줄에 합쳐 말줄임
   const msgSize = Math.round(W * 0.038);
   ctx.font = `700 ${msgSize}px ${fontFamily}`;
-  const lines = wrapText(ctx, `“${card.message}”`, maxWidth);
+  let lines = wrapText(ctx, `“${card.message}”`, maxWidth);
+  if (lines.length > 2) lines = [lines[0], ellipsize(ctx, lines.slice(1).join(' '), maxWidth)];
 
-  const lineHeight = msgSize * 1.5;
   const hasNote = !!opts?.note?.trim();
 
   // 날짜(yy.mm.dd) — 아트의 리본 배너 중심에 얹는다
@@ -50,31 +47,21 @@ export async function renderCardImage(
   spaced.letterSpacing = '0px';
   ctx.textBaseline = 'alphabetic';
 
-  // 문구 — 위쪽 고정(top-anchor). 첫 줄 baseline은 줄 수와 무관하게 늘 같은 자리:
-  // 1줄 문구가 예전 세로 중앙 정렬(중앙 + 카드 높이 0.5% 하향)에서 놓이던 위치다.
-  // 줄이 늘어나면 lineHeight씩 아래로만 내려간다. 한마디 높이는 계산에서 제외.
-  let y = boxCenterY + H * 0.005 + lineHeight / 2;
-
+  // 문구 — 아트의 점선(밑줄) 위에 글씨 쓰듯 얹는다. 각 줄의 baseline을
+  // 실측 좌표(line1/line2)에 두면 글자 아랫부분이 점선 바로 위에 닿는다.
+  const lineYs = [design.line1, design.line2];
   ctx.font = `700 ${msgSize}px ${fontFamily}`;
   ctx.fillStyle = design.ink;
-  for (const line of lines) {
-    ctx.fillText(line, W / 2, y);
-    y += lineHeight;
-  }
+  lines.forEach((line, i) => {
+    ctx.fillText(line, W / 2, H * lineYs[i]);
+  });
 
-  // 받는 사람 한마디 — 문구 흐름과 무관하게 텍스트 박스 하단 경계 위 고정 좌표에 그린다
+  // 받는 사람 한마디 — 같은 방식으로 noteY 점선 위에
   if (hasNote) {
     const noteSize = Math.round(W * 0.031);
-    const noteLineH = Math.round(noteSize * 1.6);
-    const maxNoteW = W * 0.75;
-
     ctx.font = `700 ${noteSize}px ${fontFamily}`;
-    const noteText = ellipsize(ctx, opts!.note!.trim(), maxNoteW);
-    const noteY = boxBottom - noteLineH - W * 0.015;
-
     ctx.fillStyle = design.accent;
-    ctx.textBaseline = 'middle';
-    ctx.fillText(noteText, W / 2, noteY + noteLineH / 2 + noteSize * 0.06);
+    ctx.fillText(ellipsize(ctx, opts!.note!.trim(), W * 0.75), W / 2, H * design.noteY);
   }
 
   return await new Promise<Blob>((resolve, reject) => {

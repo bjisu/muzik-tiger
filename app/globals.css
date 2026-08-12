@@ -407,17 +407,19 @@ button {
   height: auto;
 }
 
-/* 문구는 위쪽 고정 — padding-top(디자인별, ComfortCardView에서 계산)이 첫 줄 자리를 잡는다.
-   줄이 늘어나면 아래로만 자란다. */
-.card-overlay {
+/* 문구 각 줄 — 아트의 점선(밑줄) 좌표(top, 디자인별 실측)에 절대 배치.
+   translateY(-100%)로 글자 아랫부분이 점선 바로 위에 올라앉는다. */
+.card-frame .card-line {
   position: absolute;
-  left: 11%;
-  right: 11%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
+  left: 50%;
+  transform: translate(-50%, -100%);
+  max-width: 78%;
+  white-space: nowrap;
   text-align: center;
+  font-size: 3.8cqw; /* 기본값 — 넘치면 인라인 style이 축소값으로 덮는다 */
+  font-weight: 800;
+  line-height: 1.2;
+  word-break: keep-all;
 }
 
 /* 아트의 리본 배너 위 날짜 — 리본 중심에 세로 정렬 */
@@ -433,23 +435,15 @@ button {
   line-height: 1;
 }
 
-.card-overlay .card-message {
-  font-size: 3.8cqw;
-  font-weight: 800;
-  line-height: 1.55;
-  word-break: keep-all;
-}
-
-/* 한마디는 흐름에서 빠져 텍스트 박스 하단에 겹쳐 뜬다 — 날짜·문구 위치에 영향 없음 */
-.card-overlay .card-note {
+/* 받는 사람 한마디 — 문구와 같은 방식으로 noteY 점선 위에 얹는다 */
+.card-frame .card-note {
   position: absolute;
   left: 50%;
-  bottom: 1.5cqw;
-  transform: translateX(-50%);
+  transform: translate(-50%, -100%);
   font-size: 3.1cqw;
   font-weight: 700;
-  line-height: 1.6;
-  max-width: 96%; /* .card-overlay 폭(카드의 78%) 기준 → 카드 폭의 약 75% */
+  line-height: 1.2;
+  max-width: 78%;
   text-align: center;
   white-space: nowrap;
   overflow: hidden;

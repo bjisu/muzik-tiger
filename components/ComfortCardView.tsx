@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import type { CardDesign, ComfortCard } from '@/lib/types';
 import { designOf, formatCardDate } from '@/lib/cards';
 
@@ -12,26 +13,59 @@ interface Props {
   onClick?: () => void;
 }
 
-/** globals.css .card-message의 font-size(3.8cqw) × line-height(1.55) — 한 줄 높이(cqw) */
-const MSG_LINE_H_CQW = 3.8 * 1.55;
+/** 측정 기준 폭 — 실제 카드 폭과 무관하게 비율만 맞으면 된다 */
+const REF_W = 1000;
+/** globals.css .card-line 의 font-size 3.8cqw 에 대응 */
+const MSG_FONT_CQW = 3.8;
+
+interface MsgLayout {
+  lines: string[];
+  /** 가장 긴 줄이 카드 폭 78%를 넘을 때 1 미만 — 폰트를 그만큼 줄인다 */
+  scale: number;
+}
+
+/**
+ * 문구를 최대 2줄로 분할 — 카드 폭 72%를 넘으면 중간에서 가장 가까운 공백에서 나눈다.
+ * 분할 후에도 78%를 넘는 줄이 있으면 폰트 축소 배율을 함께 돌려준다.
+ */
+function layoutMessage(text: string): MsgLayout {
+  if (typeof document === 'undefined') return { lines: [text], scale: 1 };
+  const ctx = document.createElement('canvas').getContext('2d');
+  if (!ctx) return { lines: [text], scale: 1 };
+
+  ctx.font = `800 ${REF_W * (MSG_FONT_CQW / 100)}px 'Pretendard', 'Pretendard Variable', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif`;
+
+  let lines = [text];
+  if (ctx.measureText(text).width > REF_W * 0.72) {
+    const mid = text.length / 2;
+    let split = -1;
+    for (let i = 0; i < text.length; i++) {
+      if (text[i] === ' ' && (split < 0 || Math.abs(i - mid) < Math.abs(split - mid))) split = i;
+    }
+    if (split > 0) lines = [text.slice(0, split), text.slice(split + 1)];
+  }
+
+  const widest = Math.max(...lines.map((l) => ctx.measureText(l).width));
+  return { lines, scale: Math.min(1, (REF_W * 0.78) / widest) };
+}
 
 /**
  * 위로 카드 뷰 — 원작 카드 아트를 배경으로 쓰고,
- * 하단 '오늘의 한마디' 박스 영역에 위로 문구를 오버레이한다.
+ * 문구·한마디를 아트의 점선(밑줄) 위에 글씨 쓰듯 얹는다.
+ * 각 줄은 카드 전체 높이 기준 실측 좌표(line1/line2/noteY)에 절대 배치,
+ * translateY(-100%)로 글자 아랫부분이 점선 바로 위에 닿는다.
  */
 export default function ComfortCardView({ card, note, design: fixedDesign, onClick }: Props) {
   const design = designOf(card, { design: fixedDesign });
-  const hasNote = !!note?.trim();
+  const trimmedNote = note?.trim();
 
-  // 문구는 위쪽 고정(top-anchor) — 첫 줄은 줄 수와 무관하게 늘 같은 자리.
-  // 기준 위치는 예전 세로 중앙 정렬에서 1줄 문구가 놓이던 곳(중앙 + 카드 높이 0.5% 하향).
-  const overlayHeightCqw = (design.textBottom - design.textTop) * design.aspect * 100;
-  const msgTopCqw = (overlayHeightCqw - MSG_LINE_H_CQW) / 2 + design.aspect * 0.5;
-  const overlayStyle: React.CSSProperties = {
-    top: `${design.textTop * 100}%`,
-    bottom: `${(1 - design.textBottom) * 100}%`,
-    paddingTop: `${msgTopCqw}cqw`,
-  };
+  // SSR·첫 렌더는 1줄로 두고, 마운트 후 실측 분할로 갱신(하이드레이션 불일치 방지)
+  const [msg, setMsg] = useState<MsgLayout>({ lines: [`“${card.message}”`], scale: 1 });
+  useEffect(() => {
+    setMsg(layoutMessage(`“${card.message}”`));
+  }, [card.message]);
+
+  const lineTops = [design.line1, design.line2];
 
   return (
     <div
@@ -49,16 +83,27 @@ export default function ComfortCardView({ card, note, design: fixedDesign, onCli
       >
         {formatCardDate()}
       </div>
-      <div className="card-overlay" style={overlayStyle}>
-        <div className="card-message" style={{ color: design.ink }}>
-          “{card.message}”
+      {msg.lines.slice(0, 2).map((line, i) => (
+        <div
+          key={i}
+          className="card-line"
+          style={{
+            top: `${lineTops[i] * 100}%`,
+            color: design.ink,
+            fontSize: `${(MSG_FONT_CQW * msg.scale).toFixed(2)}cqw`,
+          }}
+        >
+          {line}
         </div>
-        {hasNote && (
-          <div className="card-note" style={{ color: design.accent }}>
-            {note?.trim()}
-          </div>
-        )}
-      </div>
+      ))}
+      {trimmedNote && (
+        <div
+          className="card-note"
+          style={{ top: `${design.noteY * 100}%`, color: design.accent }}
+        >
+          {trimmedNote}
+        </div>
+      )}
     </div>
   );
 }

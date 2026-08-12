@@ -6,14 +6,18 @@ export const CARDS: ComfortCard[] = rawCards as ComfortCard[];
 
 const RECENT_WINDOW = 7; // 최근 N장 재노출 방지
 
-/** 카드 배경 템플릿 정보 — 텍스트 영역 위치는 원본 아트의 '오늘의 한마디' 박스 기준 */
+/**
+ * 카드 배경 템플릿 정보 — 문구는 아트의 점선(밑줄) 위에 글씨를 쓰는 방식.
+ * line1/line2/noteY는 각 점선의 y좌표(카드 전체 높이 대비 비율, 실측값).
+ * 글자 아랫부분이 이 좌표에 닿도록 배치한다.
+ */
 export interface DesignSpec {
   key: CardDesign;
   label: string;
   src: string; // 화면·캔버스 렌더용(최적화본)
-  aspect: number; // 원본 아트의 높이/너비 비율 — CSS cqw 단위로 세로 좌표를 계산할 때 쓴다
-  textTop: number; // 카드 높이 대비 텍스트 영역 시작(비율)
-  textBottom: number; // 텍스트 영역 끝(비율)
+  line1: number; // 점선 1 — 문구 첫 줄이 올라앉는 자리
+  line2: number; // 점선 2 — 문구 둘째 줄 자리
+  noteY: number; // 받는 사람 한마디 자리
   ink: string; // 문구 색
   accent: string; // 포인트 색(받는 사람 한마디)
   ribbonY: number; // 아트의 리본 배너 중심(카드 높이 대비) — 날짜를 여기에 얹는다
@@ -25,9 +29,10 @@ export const DESIGNS: Record<CardDesign, DesignSpec> = {
     key: 'tradition',
     label: '한국의 전통',
     src: '/cards/tradition.webp',
-    aspect: 1396 / 900,
-    textTop: 0.7367,
-    textBottom: 0.9767,
+    // 전달받은 실측값(0.810/0.857/0.928)은 리본 배너와 겹침 — 아트 픽셀 스캔값으로 보정
+    line1: 0.878,
+    line2: 0.931,
+    noteY: 0.968,
     ink: '#5B4023',
     accent: '#B0713A',
     ribbonY: 0.7969,
@@ -37,9 +42,9 @@ export const DESIGNS: Record<CardDesign, DesignSpec> = {
     key: 'forest',
     label: '숲속 피크닉',
     src: '/cards/forest.webp',
-    aspect: 1399 / 900,
-    textTop: 0.7655,
-    textBottom: 0.9814,
+    line1: 0.905,
+    line2: 0.955,
+    noteY: 0.974,
     ink: '#4A3524',
     accent: '#F18400',
     ribbonY: 0.8163,
@@ -49,9 +54,10 @@ export const DESIGNS: Record<CardDesign, DesignSpec> = {
     key: 'beach',
     label: '여름 바닷가',
     src: '/cards/beach.webp',
-    aspect: 1402 / 900,
-    textTop: 0.7276,
-    textBottom: 0.97,
+    // line1 실측값(0.815)은 박스 상단 테두리 근처라 점선(0.877)으로 보정. 나머지는 전달값 유지
+    line1: 0.877,
+    line2: 0.92,
+    noteY: 0.966,
     ink: '#33566B',
     accent: '#3D8FB5',
     ribbonY: 0.7761,
@@ -61,9 +67,10 @@ export const DESIGNS: Record<CardDesign, DesignSpec> = {
     key: 'home',
     label: '포근한 집',
     src: '/cards/home.webp',
-    aspect: 1350 / 900,
-    textTop: 0.733,
-    textBottom: 0.9744,
+    // 아트 픽셀 스캔 실측(대시 밴드 중심) — 실물 확인 후 필요하면 보정
+    line1: 0.876,
+    line2: 0.926,
+    noteY: 0.962,
     ink: '#6B4526',
     accent: '#C0762C',
     ribbonY: 0.7855,
@@ -73,9 +80,10 @@ export const DESIGNS: Record<CardDesign, DesignSpec> = {
     key: 'winter',
     label: '겨울 눈놀이',
     src: '/cards/winter.webp',
-    aspect: 1350 / 900,
-    textTop: 0.7463,
-    textBottom: 0.9856,
+    // 아트 픽셀 스캔 실측(대시 밴드 중심) — 실물 확인 후 필요하면 보정
+    line1: 0.89,
+    line2: 0.944,
+    noteY: 0.966,
     ink: '#3D6076',
     accent: '#4E8FB0',
     ribbonY: 0.7999,
