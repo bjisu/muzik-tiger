@@ -135,6 +135,28 @@ export function cardById(id: string): ComfortCard | undefined {
   return CARDS.find((c) => c.id === id);
 }
 
+/** 한 줄에 허용하는 최대 글자 수(공백 포함, 따옴표 제외) */
+export const MAX_LINE_CHARS = 15;
+
+/**
+ * 위로 문구를 따옴표 포함 최대 2줄로 분할 — 화면·공유 이미지 공용.
+ * 15자를 넘으면 중간에서 가장 가까운 공백에서 나눈다.
+ */
+export function messageLines(message: string): string[] {
+  let parts = [message];
+  if (message.length > MAX_LINE_CHARS) {
+    const mid = message.length / 2;
+    let split = -1;
+    for (let i = 0; i < message.length; i++) {
+      if (message[i] === ' ' && (split < 0 || Math.abs(i - mid) < Math.abs(split - mid))) split = i;
+    }
+    if (split > 0) parts = [message.slice(0, split), message.slice(split + 1)];
+  }
+  return parts.map(
+    (p, i) => (i === 0 ? '“' : '') + p + (i === parts.length - 1 ? '”' : ''),
+  );
+}
+
 export function timeslotOf(hour: number): Timeslot {
   if (hour >= 6 && hour < 11) return 'morning';
   if (hour >= 11 && hour < 17) return 'noon';

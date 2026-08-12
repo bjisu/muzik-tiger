@@ -1,5 +1,5 @@
 import type { CardDesign, ComfortCard } from './types';
-import { designOf, formatCardDate } from './cards';
+import { designOf, formatCardDate, messageLines } from './cards';
 
 /** 캔버스에 카드 이미지(배경 템플릿 + 문구 + 선물 한마디)를 렌더링해 Blob으로 반환 */
 export async function renderCardImage(
@@ -27,11 +27,13 @@ export async function renderCardImage(
   ctx.textAlign = 'center';
   ctx.textBaseline = 'alphabetic';
 
-  // 문구 줄바꿈 — 점선이 2개뿐이라 최대 2줄. 넘치면 나머지는 둘째 줄에 합쳐 말줄임
+  // 문구 분할은 글자 수 기반(15자) — 화면(messageLines)과 동일 기준.
+  // 최장 줄이 최대 폭을 넘으면 화면과 같은 규칙으로 폰트를 비례 축소한다.
   const msgSize = Math.round(W * 0.038);
   ctx.font = `700 ${msgSize}px ${fontFamily}`;
-  let lines = wrapText(ctx, `“${card.message}”`, maxWidth);
-  if (lines.length > 2) lines = [lines[0], ellipsize(ctx, lines.slice(1).join(' '), maxWidth)];
+  const lines = messageLines(card.message);
+  const widest = Math.max(...lines.map((l) => ctx.measureText(l).width));
+  const drawSize = widest > maxWidth ? Math.floor((msgSize * maxWidth) / widest) : msgSize;
 
   const hasNote = !!opts?.note?.trim();
 
@@ -50,7 +52,7 @@ export async function renderCardImage(
   // 문구 — 아트의 점선(밑줄) 위에 글씨 쓰듯 얹는다. 각 줄의 baseline을
   // 실측 좌표(line1/line2)에 두면 글자 아랫부분이 점선 바로 위에 닿는다.
   const lineYs = [design.line1, design.line2];
-  ctx.font = `700 ${msgSize}px ${fontFamily}`;
+  ctx.font = `700 ${drawSize}px ${fontFamily}`;
   ctx.fillStyle = design.ink;
   lines.forEach((line, i) => {
     ctx.fillText(line, W / 2, H * lineYs[i]);
@@ -85,23 +87,6 @@ function loadImage(src: string): Promise<HTMLImageElement> {
     img.onerror = reject;
     img.src = src;
   });
-}
-
-function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
-  const words = text.split(' ');
-  const lines: string[] = [];
-  let line = '';
-  for (const word of words) {
-    const test = line ? line + ' ' + word : word;
-    if (ctx.measureText(test).width > maxWidth && line) {
-      lines.push(line);
-      line = word;
-    } else {
-      line = test;
-    }
-  }
-  if (line) lines.push(line);
-  return lines;
 }
 
 /** 이미지 파일 공유 — Web Share API 우선, 안 되면 다운로드. 결과: 'shared' | 'downloaded' */

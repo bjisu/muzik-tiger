@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { CardDesign, ComfortCard } from '@/lib/types';
-import { designOf, formatCardDate } from '@/lib/cards';
+import { designOf, formatCardDate, messageLines } from '@/lib/cards';
 
 interface Props {
   card: ComfortCard;
@@ -18,36 +18,14 @@ const REF_W = 1000;
 /** globals.css .card-line 의 font-size 3.8cqw 에 대응 */
 const MSG_FONT_CQW = 3.8;
 
-interface MsgLayout {
-  lines: string[];
-  /** 가장 긴 줄이 카드 폭 80%를 넘을 때 1 미만 — 폰트를 그만큼 줄인다 */
-  scale: number;
-}
-
-/**
- * 문구를 최대 2줄로 분할 — 카드 폭 80%(한글 약 20자)를 넘으면
- * 중간에서 가장 가까운 공백에서 나눈다.
- * 분할 후에도 80%를 넘는 줄이 있으면 폰트 축소 배율을 함께 돌려준다.
- */
-function layoutMessage(text: string): MsgLayout {
-  if (typeof document === 'undefined') return { lines: [text], scale: 1 };
+/** 가장 긴 줄이 카드 폭 80%를 넘으면 폰트 축소 배율(1 미만)을 계산 */
+function measureScale(lines: string[]): number {
+  if (typeof document === 'undefined') return 1;
   const ctx = document.createElement('canvas').getContext('2d');
-  if (!ctx) return { lines: [text], scale: 1 };
-
+  if (!ctx) return 1;
   ctx.font = `800 ${REF_W * (MSG_FONT_CQW / 100)}px 'Pretendard', 'Pretendard Variable', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif`;
-
-  let lines = [text];
-  if (ctx.measureText(text).width > REF_W * 0.8) {
-    const mid = text.length / 2;
-    let split = -1;
-    for (let i = 0; i < text.length; i++) {
-      if (text[i] === ' ' && (split < 0 || Math.abs(i - mid) < Math.abs(split - mid))) split = i;
-    }
-    if (split > 0) lines = [text.slice(0, split), text.slice(split + 1)];
-  }
-
   const widest = Math.max(...lines.map((l) => ctx.measureText(l).width));
-  return { lines, scale: Math.min(1, (REF_W * 0.8) / widest) };
+  return Math.min(1, (REF_W * 0.8) / widest);
 }
 
 /**
@@ -60,11 +38,13 @@ export default function ComfortCardView({ card, note, design: fixedDesign, onCli
   const design = designOf(card, { design: fixedDesign });
   const trimmedNote = note?.trim();
 
-  // SSR·첫 렌더는 1줄로 두고, 마운트 후 실측 분할로 갱신(하이드레이션 불일치 방지)
-  const [msg, setMsg] = useState<MsgLayout>({ lines: [`“${card.message}”`], scale: 1 });
+  // 분할은 글자 수 기반이라 SSR·클라이언트가 항상 같은 결과 — 하이드레이션 안전.
+  // 폰트 축소 배율만 마운트 후 실측으로 갱신한다.
+  const lines = useMemo(() => messageLines(card.message), [card.message]);
+  const [scale, setScale] = useState(1);
   useEffect(() => {
-    setMsg(layoutMessage(`“${card.message}”`));
-  }, [card.message]);
+    setScale(measureScale(lines));
+  }, [lines]);
 
   const lineTops = [design.line1, design.line2];
 
@@ -84,14 +64,14 @@ export default function ComfortCardView({ card, note, design: fixedDesign, onCli
       >
         {formatCardDate()}
       </div>
-      {msg.lines.slice(0, 2).map((line, i) => (
+      {lines.slice(0, 2).map((line, i) => (
         <div
           key={i}
           className="card-line"
           style={{
             top: `${lineTops[i] * 100}%`,
             color: design.ink,
-            fontSize: `${(MSG_FONT_CQW * msg.scale).toFixed(2)}cqw`,
+            fontSize: `${(MSG_FONT_CQW * scale).toFixed(2)}cqw`,
           }}
         >
           {line}
