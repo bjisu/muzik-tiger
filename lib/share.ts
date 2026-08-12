@@ -75,12 +75,17 @@ function loadImage(src: string): Promise<HTMLImageElement> {
 }
 
 /**
- * 공유 메시지 텍스트 — 첫째 줄 고정 문구, 한마디가 있으면 둘째 줄로 붙인다.
- * 카카오톡 등 공유 시트의 text(카카오 SDK를 쓰게 되면 description도 이 규칙)로 쓴다.
+ * 공유 시트 페이로드 — 고정 문구는 title, 한마디는 있을 때만 text.
+ * 카톡(iOS)은 text 필드 뒤에 첨부 자리 빈 줄을 붙이므로 text는 꼭 필요할 때만 넣는다.
+ * (카카오 SDK를 도입하면 title/description에 같은 규칙 적용)
  */
-export function buildShareText(note?: string): string {
-  // 한마디가 비면 줄바꿈 자체가 안 붙고, 마지막 trim으로 앞뒤 공백·줄바꿈을 확실히 제거
-  return ['MUZIK TIGER 오늘의 위로', note?.trim()].filter(Boolean).join('\n').trim();
+export function buildShareData(file: File, note?: string): ShareData {
+  const text = note?.trim();
+  return {
+    files: [file],
+    title: 'MUZIK TIGER 오늘의 위로',
+    ...(text ? { text } : {}),
+  };
 }
 
 /** 이미지 파일 공유 — Web Share API 우선, 안 되면 다운로드. 결과: 'shared' | 'downloaded' */
@@ -90,10 +95,7 @@ export async function shareCardImage(
 ): Promise<'shared' | 'downloaded'> {
   const blob = await renderCardImage(card, { design: opts?.design });
   const file = new File([blob], 'muziktiger-comfort.png', { type: 'image/png' });
-  const shareData: ShareData = {
-    files: [file],
-    text: buildShareText(opts?.note),
-  };
+  const shareData = buildShareData(file, opts?.note);
 
   if (typeof navigator !== 'undefined' && navigator.canShare?.({ files: [file] })) {
     try {

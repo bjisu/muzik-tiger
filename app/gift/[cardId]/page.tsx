@@ -6,7 +6,7 @@ import { useParams, useSearchParams } from 'next/navigation';
 import ComfortCardView from '@/components/ComfortCardView';
 import { useToast } from '@/components/Toast';
 import { cardById, isCardDesign } from '@/lib/cards';
-import { renderCardImage, downloadBlob, buildShareText } from '@/lib/share';
+import { renderCardImage, downloadBlob, buildShareData } from '@/lib/share';
 import { logEvent } from '@/lib/analytics';
 
 const FILE_NAME = 'muziktiger-comfort.png';
@@ -64,8 +64,8 @@ export default function GiftPage() {
       const blob = await buildImage();
       const file = new File([blob], FILE_NAME, { type: 'image/png' });
       if (navigator.canShare?.({ files: [file] })) {
-        // 첫째 줄 고정 문구 + 둘째 줄 한마디(있을 때만) — 카톡 등에서 이미지와 함께 전달
-        await navigator.share({ files: [file], text: buildShareText(note) });
+        // 고정 문구는 title, 한마디는 있을 때만 text — 카톡이 text 뒤에 빈 줄을 붙이는 문제 회피
+        await navigator.share(buildShareData(file, note));
       } else {
         downloadBlob(blob, FILE_NAME);
         showToast('이 브라우저는 공유를 지원하지 않아 이미지를 저장했어요.');
