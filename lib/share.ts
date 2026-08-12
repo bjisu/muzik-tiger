@@ -30,7 +30,7 @@ export async function renderCardImage(
   ctx.textAlign = 'center';
   ctx.textBaseline = 'alphabetic';
 
-  // 문구 분할은 글자 수 기반(15자) — 화면(messageLines)과 동일 기준.
+  // 문구 분할은 글자 수 기반(MAX_LINE_CHARS) — 화면(messageLines)과 동일 기준.
   // 최장 줄이 최대 폭을 넘으면 화면과 같은 규칙으로 폰트를 비례 축소한다.
   const msgSize = Math.round(W * 0.038);
   ctx.font = `700 ${msgSize}px ${fontFamily}`;

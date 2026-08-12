@@ -130,11 +130,11 @@ export function cardById(id: string): ComfortCard | undefined {
 }
 
 /** 한 줄에 허용하는 최대 글자 수(공백 포함, 따옴표 제외) */
-export const MAX_LINE_CHARS = 15;
+export const MAX_LINE_CHARS = 18;
 
 /**
  * 위로 문구를 따옴표 포함 최대 2줄로 분할 — 화면·공유 이미지 공용.
- * 15자를 넘으면 중간에서 가장 가까운 공백에서 나눈다.
+ * 18자를 넘으면 중간에서 가장 가까운 공백에서 나눈다.
  */
 export function messageLines(message: string): string[] {
   let parts = [message];
