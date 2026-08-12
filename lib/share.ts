@@ -75,17 +75,15 @@ function loadImage(src: string): Promise<HTMLImageElement> {
 }
 
 /**
- * 공유 시트 페이로드 — 고정 문구는 title, 한마디는 있을 때만 text.
- * 카톡(iOS)은 text 필드 뒤에 첨부 자리 빈 줄을 붙이므로 text는 꼭 필요할 때만 넣는다.
- * (카카오 SDK를 도입하면 title/description에 같은 규칙 적용)
+ * 공유 시트 페이로드 — 카톡(iOS)은 title/text가 있으면 말풍선 끝에 빈 줄을 붙인다.
+ * 그래서 한마디가 없으면 이미지만 보내고(빈 줄 없음),
+ * 한마디가 있을 때만 고정 문구 + 한마디 두 줄을 text로 싣는다(빈 줄 감수).
  */
 export function buildShareData(file: File, note?: string): ShareData {
-  const text = note?.trim();
-  return {
-    files: [file],
-    title: 'MUZIK TIGER 오늘의 위로',
-    ...(text ? { text } : {}),
-  };
+  const trimmed = note?.trim();
+  return trimmed
+    ? { files: [file], text: `MUZIK TIGER 오늘의 위로\n${trimmed}` }
+    : { files: [file] };
 }
 
 /** 이미지 파일 공유 — Web Share API 우선, 안 되면 다운로드. 결과: 'shared' | 'downloaded' */
