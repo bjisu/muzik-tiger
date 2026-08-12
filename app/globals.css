@@ -413,7 +413,7 @@ button {
   position: absolute;
   left: 50%;
   transform: translate(-50%, -100%);
-  max-width: 78%;
+  max-width: 80%;
   white-space: nowrap;
   text-align: center;
   font-size: 3.8cqw; /* 기본값 — 넘치면 인라인 style이 축소값으로 덮는다 */

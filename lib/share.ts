@@ -19,7 +19,7 @@ export async function renderCardImage(
 
   const W = canvas.width;
   const H = canvas.height;
-  const maxWidth = W * 0.72;
+  const maxWidth = W * 0.8; // 한글 약 20자까지 한 줄 유지 — 화면(layoutMessage)과 동일 기준
 
   const fontFamily =
     "'Pretendard', 'Pretendard Variable', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif";

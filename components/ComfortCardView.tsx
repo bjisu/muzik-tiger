@@ -20,13 +20,14 @@ const MSG_FONT_CQW = 3.8;
 
 interface MsgLayout {
   lines: string[];
-  /** 가장 긴 줄이 카드 폭 78%를 넘을 때 1 미만 — 폰트를 그만큼 줄인다 */
+  /** 가장 긴 줄이 카드 폭 80%를 넘을 때 1 미만 — 폰트를 그만큼 줄인다 */
   scale: number;
 }
 
 /**
- * 문구를 최대 2줄로 분할 — 카드 폭 72%를 넘으면 중간에서 가장 가까운 공백에서 나눈다.
- * 분할 후에도 78%를 넘는 줄이 있으면 폰트 축소 배율을 함께 돌려준다.
+ * 문구를 최대 2줄로 분할 — 카드 폭 80%(한글 약 20자)를 넘으면
+ * 중간에서 가장 가까운 공백에서 나눈다.
+ * 분할 후에도 80%를 넘는 줄이 있으면 폰트 축소 배율을 함께 돌려준다.
  */
 function layoutMessage(text: string): MsgLayout {
   if (typeof document === 'undefined') return { lines: [text], scale: 1 };
@@ -36,7 +37,7 @@ function layoutMessage(text: string): MsgLayout {
   ctx.font = `800 ${REF_W * (MSG_FONT_CQW / 100)}px 'Pretendard', 'Pretendard Variable', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif`;
 
   let lines = [text];
-  if (ctx.measureText(text).width > REF_W * 0.72) {
+  if (ctx.measureText(text).width > REF_W * 0.8) {
     const mid = text.length / 2;
     let split = -1;
     for (let i = 0; i < text.length; i++) {
@@ -46,7 +47,7 @@ function layoutMessage(text: string): MsgLayout {
   }
 
   const widest = Math.max(...lines.map((l) => ctx.measureText(l).width));
-  return { lines, scale: Math.min(1, (REF_W * 0.78) / widest) };
+  return { lines, scale: Math.min(1, (REF_W * 0.8) / widest) };
 }
 
 /**
