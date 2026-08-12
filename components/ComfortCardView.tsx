@@ -6,8 +6,6 @@ import { designOf, formatCardDate, messageLines } from '@/lib/cards';
 
 interface Props {
   card: ComfortCard;
-  /** 카드에 함께 표시할 선물 한마디(선택) */
-  note?: string;
   /** 배경 디자인 고정(저장된 카드·선물 링크). 없으면 오늘 날짜 기준으로 배정 */
   design?: CardDesign | null;
   onClick?: () => void;
@@ -30,13 +28,13 @@ function measureScale(lines: string[]): number {
 
 /**
  * 위로 카드 뷰 — 원작 카드 아트를 배경으로 쓰고,
- * 문구·한마디를 아트의 점선(밑줄) 위에 글씨 쓰듯 얹는다.
- * 각 줄은 카드 전체 높이 기준 실측 좌표(line1/line2/noteY)에 절대 배치,
+ * 문구를 아트의 점선(밑줄) 위에 글씨 쓰듯 얹는다.
+ * 각 줄은 카드 전체 높이 기준 실측 좌표(line1/line2)에 절대 배치,
  * translateY(-100%)로 글자 아랫부분이 점선 바로 위에 닿는다.
+ * 받는 사람 한마디는 카드에 그리지 않는다 — 공유 메시지 텍스트로만 전달.
  */
-export default function ComfortCardView({ card, note, design: fixedDesign, onClick }: Props) {
+export default function ComfortCardView({ card, design: fixedDesign, onClick }: Props) {
   const design = designOf(card, { design: fixedDesign });
-  const trimmedNote = note?.trim();
 
   // 분할은 글자 수 기반이라 SSR·클라이언트가 항상 같은 결과 — 하이드레이션 안전.
   // 폰트 축소 배율만 마운트 후 실측으로 갱신한다.
@@ -77,14 +75,6 @@ export default function ComfortCardView({ card, note, design: fixedDesign, onCli
           {line}
         </div>
       ))}
-      {trimmedNote && (
-        <div
-          className="card-note"
-          style={{ top: `${design.noteY * 100}%`, color: design.accent }}
-        >
-          {trimmedNote}
-        </div>
-      )}
     </div>
   );
 }

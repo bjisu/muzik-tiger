@@ -6,12 +6,10 @@ import { useParams, useSearchParams } from 'next/navigation';
 import ComfortCardView from '@/components/ComfortCardView';
 import { useToast } from '@/components/Toast';
 import { cardById, isCardDesign } from '@/lib/cards';
-import { renderCardImage, downloadBlob } from '@/lib/share';
+import { renderCardImage, downloadBlob, buildShareText } from '@/lib/share';
 import { logEvent } from '@/lib/analytics';
 
 const FILE_NAME = 'muziktiger-comfort.png';
-/** 공유 시트에 실리는 제목. 카톡에서 여러 줄로 붙지 않도록 이 한 줄만 넘기고 text는 넣지 않는다 */
-const SHARE_TITLE = '무직타이거 오늘의 위로';
 
 /** C-03 선물 공유 — 카드 프리뷰 + 받는 사람 한마디 + 이미지 저장 / OS 공유 (기획서 6) */
 export default function GiftPage() {
@@ -40,7 +38,8 @@ export default function GiftPage() {
     );
   }
 
-  const buildImage = () => renderCardImage(card, { note, design: fixedDesign });
+  // 한마디는 이미지에 넣지 않는다 — 공유 메시지 텍스트(buildShareText)로만 전달
+  const buildImage = () => renderCardImage(card, { design: fixedDesign });
 
   /** 이미지 저장하기 — 공유 시트 없이 바로 다운로드(성공 시 토스트도 띄우지 않는다) */
   const onSave = async () => {
@@ -65,8 +64,8 @@ export default function GiftPage() {
       const blob = await buildImage();
       const file = new File([blob], FILE_NAME, { type: 'image/png' });
       if (navigator.canShare?.({ files: [file] })) {
-        // 문구·한마디가 이미지 안에 들어 있으므로 text는 붙이지 않는다
-        await navigator.share({ files: [file], title: SHARE_TITLE });
+        // 첫째 줄 고정 문구 + 둘째 줄 한마디(있을 때만) — 카톡 등에서 이미지와 함께 전달
+        await navigator.share({ files: [file], text: buildShareText(note) });
       } else {
         downloadBlob(blob, FILE_NAME);
         showToast('이 브라우저는 공유를 지원하지 않아 이미지를 저장했어요.');
@@ -93,7 +92,7 @@ export default function GiftPage() {
         <div className="gift-title">친구에게 선물 🎁</div>
         <div className="gift-sub">오늘의 위로를 소중한 사람에게 전해보세요</div>
 
-        <ComfortCardView card={card} note={note} design={fixedDesign} />
+        <ComfortCardView card={card} design={fixedDesign} />
 
         <div className="gift-note">
           <label htmlFor="gift-note-input">받는 사람에게 한마디</label>

@@ -435,21 +435,6 @@ button {
   line-height: 1;
 }
 
-/* 받는 사람 한마디 — 문구와 같은 방식으로 noteY 점선 위에 얹는다 */
-.card-frame .card-note {
-  position: absolute;
-  left: 50%;
-  transform: translate(-50%, -100%);
-  font-size: 3.1cqw;
-  font-weight: 700;
-  line-height: 1.2;
-  max-width: 78%;
-  text-align: center;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 /* ─── 버튼 ─── */
 .btn-row {
   display: flex;
