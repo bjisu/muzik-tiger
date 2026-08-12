@@ -50,17 +50,16 @@ export async function renderCardImage(
   spaced.letterSpacing = '0px';
   ctx.textBaseline = 'alphabetic';
 
-  // 문구 블록 — 한마디 유무와 무관하게 항상 같은 좌표(한마디 높이는 계산에서 제외)
-  // 중앙에서 카드 높이의 0.5%만큼 아래로 내린다 — 리본에 붙지 않게
-  // (디자인별 미세 조정은 textTop이 담당)
-  const blockHeight = lines.length * lineHeight;
-  let y = boxCenterY - blockHeight / 2 + H * 0.005;
+  // 문구 — 위쪽 고정(top-anchor). 첫 줄 baseline은 줄 수와 무관하게 늘 같은 자리:
+  // 1줄 문구가 예전 세로 중앙 정렬(중앙 + 카드 높이 0.5% 하향)에서 놓이던 위치다.
+  // 줄이 늘어나면 lineHeight씩 아래로만 내려간다. 한마디 높이는 계산에서 제외.
+  let y = boxCenterY + H * 0.005 + lineHeight / 2;
 
   ctx.font = `700 ${msgSize}px ${fontFamily}`;
   ctx.fillStyle = design.ink;
   for (const line of lines) {
-    y += lineHeight;
     ctx.fillText(line, W / 2, y);
+    y += lineHeight;
   }
 
   // 받는 사람 한마디 — 문구 흐름과 무관하게 텍스트 박스 하단 경계 위 고정 좌표에 그린다

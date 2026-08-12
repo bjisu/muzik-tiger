@@ -11,6 +11,7 @@ export interface DesignSpec {
   key: CardDesign;
   label: string;
   src: string; // 화면·캔버스 렌더용(최적화본)
+  aspect: number; // 원본 아트의 높이/너비 비율 — CSS cqw 단위로 세로 좌표를 계산할 때 쓴다
   textTop: number; // 카드 높이 대비 텍스트 영역 시작(비율)
   textBottom: number; // 텍스트 영역 끝(비율)
   ink: string; // 문구 색
@@ -24,6 +25,7 @@ export const DESIGNS: Record<CardDesign, DesignSpec> = {
     key: 'tradition',
     label: '한국의 전통',
     src: '/cards/tradition.webp',
+    aspect: 1396 / 900,
     textTop: 0.7367,
     textBottom: 0.9767,
     ink: '#5B4023',
@@ -35,6 +37,7 @@ export const DESIGNS: Record<CardDesign, DesignSpec> = {
     key: 'forest',
     label: '숲속 피크닉',
     src: '/cards/forest.webp',
+    aspect: 1399 / 900,
     textTop: 0.7655,
     textBottom: 0.9814,
     ink: '#4A3524',
@@ -46,6 +49,7 @@ export const DESIGNS: Record<CardDesign, DesignSpec> = {
     key: 'beach',
     label: '여름 바닷가',
     src: '/cards/beach.webp',
+    aspect: 1402 / 900,
     textTop: 0.7276,
     textBottom: 0.97,
     ink: '#33566B',
@@ -57,6 +61,7 @@ export const DESIGNS: Record<CardDesign, DesignSpec> = {
     key: 'home',
     label: '포근한 집',
     src: '/cards/home.webp',
+    aspect: 1350 / 900,
     textTop: 0.733,
     textBottom: 0.9744,
     ink: '#6B4526',
@@ -68,6 +73,7 @@ export const DESIGNS: Record<CardDesign, DesignSpec> = {
     key: 'winter',
     label: '겨울 눈놀이',
     src: '/cards/winter.webp',
+    aspect: 1350 / 900,
     textTop: 0.7463,
     textBottom: 0.9856,
     ink: '#3D6076',

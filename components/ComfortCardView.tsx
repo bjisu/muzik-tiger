@@ -12,6 +12,9 @@ interface Props {
   onClick?: () => void;
 }
 
+/** globals.css .card-message의 font-size(3.8cqw) × line-height(1.55) — 한 줄 높이(cqw) */
+const MSG_LINE_H_CQW = 3.8 * 1.55;
+
 /**
  * 위로 카드 뷰 — 원작 카드 아트를 배경으로 쓰고,
  * 하단 '오늘의 한마디' 박스 영역에 위로 문구를 오버레이한다.
@@ -19,9 +22,15 @@ interface Props {
 export default function ComfortCardView({ card, note, design: fixedDesign, onClick }: Props) {
   const design = designOf(card, { design: fixedDesign });
   const hasNote = !!note?.trim();
+
+  // 문구는 위쪽 고정(top-anchor) — 첫 줄은 줄 수와 무관하게 늘 같은 자리.
+  // 기준 위치는 예전 세로 중앙 정렬에서 1줄 문구가 놓이던 곳(중앙 + 카드 높이 0.5% 하향).
+  const overlayHeightCqw = (design.textBottom - design.textTop) * design.aspect * 100;
+  const msgTopCqw = (overlayHeightCqw - MSG_LINE_H_CQW) / 2 + design.aspect * 0.5;
   const overlayStyle: React.CSSProperties = {
     top: `${design.textTop * 100}%`,
     bottom: `${(1 - design.textBottom) * 100}%`,
+    paddingTop: `${msgTopCqw}cqw`,
   };
 
   return (

@@ -407,6 +407,8 @@ button {
   height: auto;
 }
 
+/* 문구는 위쪽 고정 — padding-top(디자인별, ComfortCardView에서 계산)이 첫 줄 자리를 잡는다.
+   줄이 늘어나면 아래로만 자란다. */
 .card-overlay {
   position: absolute;
   left: 11%;
@@ -414,9 +416,8 @@ button {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   text-align: center;
-  gap: 1.2cqw;
 }
 
 /* 아트의 리본 배너 위 날짜 — 리본 중심에 세로 정렬 */
@@ -437,10 +438,6 @@ button {
   font-weight: 800;
   line-height: 1.55;
   word-break: keep-all;
-  /* 텍스트 영역 중앙에서 카드 높이의 0.5%만큼 아래로(≈0.75cqw, 카드 비율 1:1.5 기준).
-     transform이라 레이아웃 높이에 영향이 없고, 한마디는 absolute라 그대로 고정된다.
-     디자인별 미세 위치는 DESIGNS의 textTop이 맡는다. */
-  transform: translateY(0.75cqw);
 }
 
 /* 한마디는 흐름에서 빠져 텍스트 박스 하단에 겹쳐 뜬다 — 날짜·문구 위치에 영향 없음 */
